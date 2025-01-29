@@ -1,0 +1,38 @@
+{
+  "name": "@tacxtv/oh_mine_shop",
+  "version": "0.0.1",
+  "description": "A simple and lightweight Shop for Minecraft",
+  "repository": "https://github.com/tacxtv/oh_mine_shop.git",
+  "private": true,
+  "license": "AGPL-3.0-only",
+  "author": "Tacx <12997062+tacxou@users.noreply.github.com>",
+  "contributors": [
+    {
+      "name": " tacxou",
+      "email": "12997062+tacxou@users.noreply.github.com",
+      "url": "https://github.com/tacxou"
+    },
+    {
+      "name": "Contributors",
+      "url": "https://github.com/tacxtv/oh_mine_shop/graphs/contributors"
+    }
+  ],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "start:dev": "turbo run start:dev",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "lint": "turbo run lint"
+  },
+  "dependencies": {
+    "ts-mixer": "^6.0.4"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2",
+    "turbo": "^2.3.3"
+  },
+  "packageManager": "yarn@1.22.22"
+}
