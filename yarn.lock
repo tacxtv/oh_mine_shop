@@ -776,6 +776,11 @@
   dependencies:
     defer-to-connect "^2.0.1"
 
+"@the-software-compagny/nestjs_module_rcon@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@the-software-compagny/nestjs_module_rcon/-/nestjs_module_rcon-1.0.2.tgz#de96ce3b09d1ca3c4888e81d936f9167e530b6fa"
+  integrity sha512-GUlMnXFYoSFyVA84oHZs+Y94vqoAnKKU5vRhcTs9xYZs5IWqygIbRLnubJojnz4KfLqHHbhkOemovFIFQZ7XrQ==
+
 "@the-software-compagny/nestjs_module_restools@^0.0.11":
   version "0.0.11"
   resolved "https://registry.yarnpkg.com/@the-software-compagny/nestjs_module_restools/-/nestjs_module_restools-0.0.11.tgz#0af24c877c0b3eb8ac5a687e5d63523ba09aa375"
@@ -3072,6 +3077,11 @@ natural-compare@^1.4.0:
   resolved "https://registry.yarnpkg.com/natural-compare/-/natural-compare-1.4.0.tgz#4abebfeed7541f2c27acfb29bdbbd15c8d5ba4f7"
   integrity sha512-OWND8ei3VtNC9h7V60qff3SVobHr996CTwgxubgyQYEpg290h9J0buyECNNJexkFm5sOajh5G116RYA1c8ZMSw==
 
+nbt-ts@^1.3.6:
+  version "1.3.6"
+  resolved "https://registry.yarnpkg.com/nbt-ts/-/nbt-ts-1.3.6.tgz#e92040073ff8918bfca9ebf1f5a86a5050ed82cd"
+  integrity sha512-TFMiJu0BQrH6IrVjVgk1osoN58Ep3SDz4rIM5h5y3nabT6sdSujnKKV9nJyEWBO/JfdWWCma3fiagcOvlXLojw==
+
 negotiator@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/negotiator/-/negotiator-1.0.0.tgz#b6c91bb47172d69f93cfd7c357bbb529019b5f6a"
@@ -3421,6 +3431,13 @@ raw-body@^3.0.0:
     http-errors "2.0.0"
     iconv-lite "0.6.3"
     unpipe "1.0.0"
+
+rcon-client@^4.2.5:
+  version "4.2.5"
+  resolved "https://registry.yarnpkg.com/rcon-client/-/rcon-client-4.2.5.tgz#351ac57b04f94c7fc139b1419d0db4e6058a9fbf"
+  integrity sha512-AnX1GU/ZTlwtYup3H6h0J1hwfP3OYltXVe+8ReBzmNEepX3xGH8nDg7gYqT5Y9rpAS/LmQ48h0BKINt1YGd8bA==
+  dependencies:
+    typed-emitter "^0.1.0"
 
 readable-stream@^2.2.2:
   version "2.3.8"
@@ -4114,6 +4131,11 @@ type-is@^2.0.0:
     content-type "^1.0.5"
     media-typer "^1.1.0"
     mime-types "^3.0.0"
+
+typed-emitter@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/typed-emitter/-/typed-emitter-0.1.0.tgz#ca532f100ccbf850e3a73b8ebf43d43e4f1f3849"
+  integrity sha512-Tfay0l6gJMP5rkil8CzGbLthukn+9BN/VXWcABVFPjOoelJ+koW8BuPZYk+h/L+lEeIp1fSzVRiWRPIjKVjPdg==
 
 typedarray@^0.0.6:
   version "0.0.6"

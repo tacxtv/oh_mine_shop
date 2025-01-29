@@ -2,7 +2,8 @@
 
 PROJECT_NAME := oms
 OMS_MINECRAFT_VERSION := 1.20.1
-OMS_MINECRAFT_PORT := 25565
+OMS_MINECRAFT_GAME_PORT := 25565
+OMS_MINECRAFT_RCON_PORT := 25575
 
 ifneq (,$(wildcard ./.env))
 	include .env
@@ -18,7 +19,8 @@ help:
 dev-minecraft: ## Start the Minecraft server in development mode
 	@docker run -it --rm \
 		--name $(PROJECT_NAME)-minecraft \
-		-p $(OMS_MINECRAFT_PORT):25565 \
+		-p $(OMS_MINECRAFT_GAME_PORT):25565 \
+		-p $(OMS_MINECRAFT_RCON_PORT):25575 \
 		-v $(CURDIR)/minecraft/data:/data \
 		-e EULA=TRUE \
 		-e TYPE=VANILLA \
