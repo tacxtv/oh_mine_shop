@@ -17,7 +17,6 @@
     }
   ],
   "scripts": {
-    "postinstall": "nuxt prepare",
     "build": "nuxt build",
     "start:dev": "nuxt dev",
     "start:prod": "node .output/server/index.mjs",
