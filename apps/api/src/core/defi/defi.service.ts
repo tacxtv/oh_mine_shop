@@ -18,7 +18,7 @@ export class DefiService {
   ) {
   }
 
-  public async getCurrentDefi(player: string): Promise<Defis & { _data: any, _playerMaxQuantity: number, _playerParticipation: any, _playerRank: number }> {
+  public async getCurrentDefi(player?: string): Promise<Defis & { _data: any, _playerMaxQuantity: number, _playerParticipation: any, _playerRank: number }> {
     const defi = await this._model.findOne({
       startAt: { $lte: new Date() },
       endAt: { $gte: new Date() },
@@ -35,11 +35,16 @@ export class DefiService {
     } catch (error) {
     }
 
-    const _playerMaxQuantity = await this.quantityFromPlayerForDefi(player, defi.itemId)
-    const _playerParticipation = defi.participation.find((p) => p.player === player)
-    const _playerRank = defi.participation
-      .sort((a, b) => b.amount - a.amount)
-      .findIndex((p) => p.player === player) + 1
+    let _playerMaxQuantity = undefined
+    let _playerParticipation = undefined
+    let _playerRank = undefined
+    if (!player) {
+      _playerMaxQuantity = await this.quantityFromPlayerForDefi(player, defi.itemId)
+      _playerParticipation = defi.participation.find((p) => p.player === player)
+      _playerRank = defi.participation
+        .sort((a, b) => b.amount - a.amount)
+        .findIndex((p) => p.player === player) + 1
+    }
 
     return {
       ...defi.toObject(),

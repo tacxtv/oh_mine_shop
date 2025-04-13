@@ -6,8 +6,18 @@ import { Response } from 'express'
 export class DefiController {
   public constructor(private readonly _service: DefiService) { }
 
-  @Get('current/:player')
+  @Get('current')
   public async getCurrentDefi(
+    @Res() res: Response,
+  ): Promise<Response> {
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      data: await this._service.getCurrentDefi(),
+    })
+  }
+
+  @Get('current/:player')
+  public async getCurrentDefiPlayer(
     @Res() res: Response,
     @Param('player') player: string,
   ): Promise<Response> {
