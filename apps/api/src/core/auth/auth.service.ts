@@ -106,7 +106,7 @@ export class AuthService {
       },
     )
     if (!user) throw new UnauthorizedException('User not found')
-    if (!(user as any).isActive) throw new UnauthorizedException('User is not active')
+    if (!(user as any).isActive) throw new UnauthorizedException('Votre compte est en attente de validation par un administrateur')
 
     return user
   }
