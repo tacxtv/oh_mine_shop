@@ -43,7 +43,7 @@ export class ItemService implements OnModuleInit {
       }
 
       await this.syncAll()
-      await this._sftp.end()
+      // await this._sftp.end()
     } catch (e) {
       console.error('Error while connecting to SFTP', e)
     }
