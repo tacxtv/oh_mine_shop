@@ -23,6 +23,22 @@ help:
 	@printf "\033[33mUsage:\033[0m\n  make [target] [arg=\"val\"...]\n\n\033[33mTargets:\033[0m\n"
 	@awk 'BEGIN { FS = ":.*##"; } /^[a-zA-Z_0-9-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
+build: ## Build the project
+	@docker buildx build \
+		--platform linux/arm64 \
+		-t $(PROJECT_NAME) .
+
+dev-docker: ## Start the project in development mode
+	@docker run -it --rm \
+		--name $(PROJECT_NAME) \
+		-v $(CURDIR):/app \
+		-v /var/run/docker.sock:/var/run/docker.sock \
+		-p 3000:3000 \
+		-p 4000:4000 \
+		--platform $(PLATFORM) \
+		--network dev \
+		$(PROJECT_NAME)
+
 dev-minecraft: ## Start the Minecraft server in development mode
 	@docker run -it --rm \
 		--name $(PROJECT_NAME)-minecraft \

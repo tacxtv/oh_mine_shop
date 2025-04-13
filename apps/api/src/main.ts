@@ -4,8 +4,10 @@ import { NestExpressApplication } from '@nestjs/platform-express'
 import chalk from 'chalk'
 import { AppModule } from './app.module'
 import config from './config'
+import pkg from '../package.json'
 
-const APP_NAME = process.env.npm_package_name.split('/').pop().toLocaleUpperCase()
+const INTERNAL_NAME = process.env?.npm_package_name || pkg?.name || 'api'
+const APP_NAME = INTERNAL_NAME.split('/').pop().toLocaleUpperCase()
 
 declare const module: any;
 (async () => {
