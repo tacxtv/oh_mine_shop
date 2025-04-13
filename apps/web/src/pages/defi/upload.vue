@@ -116,10 +116,15 @@ export default {
 
       return `${days}j ${hours}h ${minutes}m ${seconds}s`
     },
+    getUsername() {
+      const $auth = useAuth()
+
+      return $auth.user?.name
+    },
   },
   methods: {
     async upload() {
-      await useHttp('/core/defi/participate/Tacxounet/' + this.quantity, {
+      await useHttp('/core/defi/participate/' + this.getUsername + '/' + this.quantity, {
         method: 'POST',
       })
 

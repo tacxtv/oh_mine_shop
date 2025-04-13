@@ -103,11 +103,17 @@ export default {
     }
   },
   async setup() {
+    const getUsername = computed(() => {
+      const $auth = useAuth()
+
+      return $auth.user?.name
+    })
+
     const {
       data: inventory,
       refresh,
       error,
-    } = await useHttp<any>('/minecraft/player/inventory/Tacxounet', {
+    } = await useHttp<any>('/minecraft/player/inventory/' + getUsername.value, {
       transform: (result) => {
         return result?.data || []
       },
@@ -117,6 +123,8 @@ export default {
       error,
       inventory,
       refresh,
+
+      getUsername,
     }
   },
   methods: {
