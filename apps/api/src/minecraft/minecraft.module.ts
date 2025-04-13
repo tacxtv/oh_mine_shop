@@ -1,21 +1,17 @@
 import { DynamicModule, Module } from '@nestjs/common'
+import { RouterModule } from '@nestjs/core'
 import { MinecraftController } from './minecraft.controller'
 import { MinecraftService } from './minecraft.service'
-import { RouterModule } from '@nestjs/core'
-import { LadderModule } from './ladder/ladder.module'
-import { ShopModule } from './shop/shop.module'
+import { PlayerModule } from './player/player.module'
+import { ItemModule } from './item/item.module'
 
 @Module({
   imports: [
-    LadderModule,
-    ShopModule,
+    // ItemModule,
+    PlayerModule,
   ],
-  controllers: [
-    MinecraftController,
-  ],
-  providers: [
-    MinecraftService,
-  ],
+  controllers: [MinecraftController],
+  providers: [MinecraftService],
 })
 export class MinecraftModule {
   public static register(): DynamicModule {

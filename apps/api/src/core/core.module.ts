@@ -3,19 +3,23 @@ import { CoreController } from './core.controller'
 import { CoreService } from './core.service'
 import { RouterModule } from '@nestjs/core'
 import { AuthModule } from './auth/auth.module'
-import { PlayerModule } from './player/player.module'
+import { UsersModule } from './users/users.module'
+import { OfferingModule } from './offering/offering.module'
+import { ArticleModule } from './article/article.module'
+import { DefiModule } from './defi/defi.module'
+import { RendezVousModule } from './rendez-vous/rendez-vous.module'
 
 @Module({
   imports: [
+    ArticleModule,
     AuthModule,
-    PlayerModule,
+    OfferingModule,
+    UsersModule,
+    DefiModule,
+    RendezVousModule,
   ],
-  controllers: [
-    CoreController,
-  ],
-  providers: [
-    CoreService,
-  ],
+  controllers: [CoreController],
+  providers: [CoreService],
 })
 export class CoreModule {
   public static register(): DynamicModule {

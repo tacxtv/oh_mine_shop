@@ -1,0 +1,63 @@
+@import "quasar/src/css/variables.sass"
+
+.slot
+  width: 75px
+  height: 75px
+  border: 1px solid black
+  margin: 5px
+  display: flex
+  position: relative
+  justify-content: center
+  text-align: center
+  align-items: center
+  background: gray
+  border-radius: 5px
+
+  &.big
+    width: 30vw
+    height: 30vw
+
+  &.medium
+    width: 150px
+    height: 150px
+
+  img
+    height: 65%
+    image-rendering: pixelated
+    image-rendering: -moz-crisp-edges
+    image-rendering: -o-crisp-edges
+
+  img.no-texture:before
+    content: ' '
+    display: block
+    position: absolute
+    height: 50px
+    width: 50px
+    background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBkPSJNNDc4LjYgMTY3di02Ni44aC0zMy40VjY2LjhoLTMzLjRWMzMuNEgzNDVWMEgxNjd2MzMuNGgtNjYuOHYzMy40SDY2Ljh2MzMuNEgzMy40VjE2N0gwdjE3OGgzMy40djY2LjhoMzMuNHYzMy40aDMzLjR2MzMuNEgxNjdWNTEyaDE3OHYtMzMuNGg2Ni44di0zMy40aDMzLjR2LTMzLjRoMzMuNFYzNDVINTEyVjE2N3pNMjY3LjEgNDExLjhoLTMzLjR2LTMzLjRoMzMuNHptNzgtMTY3aC0zMy40djMzLjVIMjY3VjM0NWgtMzMuNHYtNjYuN0gyNjd2LTMzLjRoNDQuNlYxMzMuNkgxODkuMnY2Ni43aC0zMy40di02Ni43aDMzLjR2LTMzLjRoMTIyLjV2MzMuNEgzNDV6Ii8+PC9zdmc+")
+    transform: translateX(-25px)
+
+  &.big
+    img.no-texture:before
+      transform: translateX(-50%)
+      height: 65%
+      width: 65%
+
+@media screen and (max-width: $breakpoint-sm)
+  .slot
+    width: 40px
+    height: 40px
+
+@media screen and (max-width: $breakpoint-xs)
+  .slot
+    width: 25px
+    height: 25px
+
+.outer-ne-resize
+  resize: vertical
+  overflow: auto
+
+.inner-ne-resize,
+.outer-ne-resize
+  transform: rotateX(180deg)
+  height: 100%
+  width: 100%
