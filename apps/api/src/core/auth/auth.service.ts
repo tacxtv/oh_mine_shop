@@ -94,7 +94,7 @@ export class AuthService {
   public async getSessionData(_id: string | Types.ObjectId): Promise<FlattenMaps<User>> {
     if (!Types.ObjectId.isValid(`${_id}`)) {
       this.logger.error('Invalid user id', _id)
-      throw new BadRequestException('Invalid user id')
+      throw new BadRequestException('Identifiant invalide, veuillez contacter un administrateur')
     }
 
     const user = await this._user.findOne(

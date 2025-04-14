@@ -71,13 +71,13 @@ export class MinecraftStrategy extends PassportStrategy(Strategy, 'minecraft') {
     delete profile.token
 
     if (!profile.premium) {
-      throw new UnauthorizedException('Only premium accounts are allowed !')
+      throw new UnauthorizedException('Vous devez posséder un compte premium (possédé Minecraft ou le GamePass) !')
     }
 
     const user = await this._service.checkUserAvailability(profile)
 
     if (!user) {
-      err = new UnauthorizedException("Unknown user")
+      err = new UnauthorizedException("Utilisateur introuvable !")
     }
 
     return done(err, user)

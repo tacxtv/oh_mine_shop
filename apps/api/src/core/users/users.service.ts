@@ -24,7 +24,7 @@ export class UsersService {
     @InjectModel(User.name)
     private readonly userModel: Model<User>,
     private readonly httpService: HttpService,
-  ) {}
+  ) { }
 
   public async findOne(query: object, projection?: object): Promise<User> {
     return this.userModel.findOne(query, projection).exec()
@@ -57,7 +57,7 @@ export class UsersService {
       ).exec())
     }
     if (user && !(user as any).isActive) {
-      throw new UnauthorizedException("User is not active")
+      throw new UnauthorizedException("Votre compte est en attente de validation par un administrateur")
     }
 
     return user.toJSON()
