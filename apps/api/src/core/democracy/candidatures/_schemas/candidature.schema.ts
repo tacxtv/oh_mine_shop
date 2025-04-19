@@ -1,4 +1,4 @@
-import { Prop, Schema } from '@nestjs/mongoose'
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 
 @Schema({
   collection: 'candidature',
@@ -23,3 +23,5 @@ export class Candidature {
   })
   public electionNumber: number
 }
+
+export const CandidatureSchema = SchemaFactory.createForClass(Candidature)

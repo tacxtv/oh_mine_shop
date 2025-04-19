@@ -1,7 +1,7 @@
 export enum UserRole {
   VILLAGEOIS = 'villageois',
   MAIRE = 'maire',
-  SHERIFF = 'sheriff',
+  SHERIF = 'sherif',
   ADJOINT = 'adjoint',
 
   SENATEUR = 'senateur',
