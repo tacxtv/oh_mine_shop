@@ -42,7 +42,7 @@ export class Law {
     type: [LawVotePartSchema],
     default: [],
   })
-  public Votes: LawVotePart[]
+  public votes: LawVotePart[]
 
   @Prop({
     type: Date,

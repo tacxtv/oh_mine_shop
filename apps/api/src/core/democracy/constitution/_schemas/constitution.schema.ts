@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
+import { ConstitutionMetadataPart, ConstitutionMetadataPartSchema } from './_parts/metadata.part.schema'
 
 @Schema({
   collection: 'constitution',
@@ -38,10 +39,10 @@ export class Constitution {
   public appliedAt: Date
 
   @Prop({
-    type: Object,
+    type: ConstitutionMetadataPartSchema,
     default: {},
   })
-  public metadata: object
+  public metadata: ConstitutionMetadataPart
 }
 
 export const ConstitutionSchema = SchemaFactory.createForClass(Constitution)
