@@ -1,20 +1,20 @@
 import { Controller, Get, HttpStatus, Res } from '@nestjs/common'
-import { ConstitutionService } from './constitution.service'
+import { LawService } from './law.service'
 import { Public } from '~/_common/_decorators/public.decorator'
 import { Response } from 'express'
 
-@Controller('constitution')
-export class ConstitutionController {
-  public constructor(private readonly _service: ConstitutionService) { }
+@Controller('law')
+export class LawController {
+  public constructor(private readonly _service: LawService) { }
 
   @Public()
   @Get()
-  public async getConstitution(
+  public async getLaws(
     @Res() res: Response,
   ): Promise<Response> {
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
-      data: await this._service.getConstitution(),
+      data: await this._service.getLaws(),
     })
   }
 }

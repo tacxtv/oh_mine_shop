@@ -8,9 +8,11 @@ import { OfferingModule } from './offering/offering.module'
 import { ArticleModule } from './article/article.module'
 import { DefiModule } from './defi/defi.module'
 import { RendezVousModule } from './rendez-vous/rendez-vous.module'
+import { DemocracyModule } from './democracy/democracy.module'
 
 @Module({
   imports: [
+    DemocracyModule.register(),
     ArticleModule,
     AuthModule,
     OfferingModule,

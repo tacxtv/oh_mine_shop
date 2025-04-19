@@ -1,7 +1,16 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
+import { InjectModel } from '@nestjs/mongoose'
+import { Constitution } from './_schemas/constitution.schema'
+import { Model } from 'mongoose'
 
 @Injectable()
 export class ConstitutionService {
-  public constructor() {
+  public constructor(@InjectModel(Constitution.name) public _model: Model<Constitution>) {
+  }
+
+  public async getConstitution(): Promise<Constitution[]> {
+    const constitution = await this._model.find().exec()
+
+    return constitution || []
   }
 }
