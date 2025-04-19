@@ -23,7 +23,7 @@ export class Constitution {
     type: String,
     required: [true, 'Constitution content is required'],
   })
-  content: string
+  content: string // is HTML
 
   @Prop({
     type: [String],

@@ -11,6 +11,12 @@ export class ConstitutionService {
   public async getConstitution(): Promise<Constitution[]> {
     const constitution = await this._model.find().exec()
 
-    return constitution || []
+    return constitution.map((item) => {
+
+      //TODO: separer les articles abrogés et les articles en cours
+      return {
+        ...item.toObject(),
+      }
+    })
   }
 }

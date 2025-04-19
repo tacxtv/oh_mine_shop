@@ -5,7 +5,6 @@ import { LawMetadataPart, LawMetadataPartSchema } from './_parts/metadata.part.s
 @Schema({
   collection: 'law',
   versionKey: false,
-  timestamps: true,
 })
 export class Law {
   @Prop({
@@ -24,7 +23,7 @@ export class Law {
     type: String,
     required: [true, 'Law content is required'],
   })
-  content: string
+  content: string // is HTML
 
   @Prop({
     type: [String],
@@ -36,7 +35,7 @@ export class Law {
     type: String,
     required: [true, 'User proposing the law is required'],
   })
-  public proposedBy: string
+  public proposedBy: string // user with maire role
 
   @Prop({
     type: [LawVotePartSchema],
@@ -49,7 +48,7 @@ export class Law {
     required: [true, 'Law applied date is required'],
     default: () => new Date(),
   })
-  public appliedAt: Date
+  public appliedAt: Date // 24h after the vote
 
   @Prop({
     type: LawMetadataPartSchema,
