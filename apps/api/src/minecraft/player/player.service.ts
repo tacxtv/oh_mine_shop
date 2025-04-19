@@ -5,6 +5,7 @@ import Redis from 'ioredis'
 import { Byte, Int, parse, Tag } from 'nbt-ts'
 import { Rcon } from 'rcon-client'
 import { ListPlayers, TagInventory } from './_interfaces/player.interface'
+import { existsSync, readFileSync } from 'node:fs'
 
 (Byte as any).prototype.toJSON = function () {
   return +this.value.toString()
@@ -75,6 +76,11 @@ export class PlayerService {
         try {
           _data = JSON.parse(data).model
         } catch (error) {
+        }
+
+        if (existsSync(`../../storage/render/${item.id.replace(':', '__')}.png`)) {
+          const file = readFileSync(`../../storage/render/${item.id.replace(':', '__')}.png`)
+          _data['texture'] = `data:image/png;base64,${file.toString('base64')}`
         }
 
         return {

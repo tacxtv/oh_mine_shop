@@ -19,14 +19,27 @@ export class AuthService {
     @InjectRedis() private readonly redis: Redis,
   ) { }
 
-  public async checkUserAvailability(profile: MinecraftProfile): Promise<FlattenMaps<User>> {
+  public async checkUserAvailabilityMinecraft(profile: MinecraftProfile): Promise<FlattenMaps<User>> {
     const user = (await this._user.findOne(
-      { email: profile.name },
+      { name: profile.name },
       { state: true },
     )) as User
-    if (user && !(user as any).isActive) throw new UnauthorizedException()
+    if (user && !(user as any).isActive) throw new UnauthorizedException('Votre compte est en attente de validation par un administrateur')
 
     return this._user.findOrCreateWithMinecraftProfile(profile)
+  }
+
+  public async checkUserAvailabilityLocal(payload: { username: string, password: string }): Promise<FlattenMaps<User>> {
+    const user = (await this._user.findOne(
+      { name: payload.username },
+      { metadata: false },
+    )) as User
+
+    if (user && !(user as any).isActive) throw new UnauthorizedException('Votre compte est en attente de validation par un administrateur')
+    if (!user) throw new UnauthorizedException('Utilisateur introuvable !')
+    if ('test' !== payload.password) throw new UnauthorizedException('Mot de passe incorrect !')
+
+    return user
   }
 
   public async tokensDelivery(user: any, refresh_token?: string) {
@@ -59,12 +72,12 @@ export class AuthService {
     }
   }
 
-  public async refreshUserToken(body: { refreshToken: string }) {
-    let currentRefreshToken = body.refreshToken
+  public async refreshUserToken(body: { refresh_token: string }) {
+    let currentRefreshToken = body.refresh_token
     try {
       await this.jwtService.verifyAsync(currentRefreshToken)
     } catch (e) {
-      throw new UnauthorizedException()
+      throw new UnauthorizedException('Unable to verify refresh token')
     }
 
     const refreshToken = this.jwtService.decode(currentRefreshToken)
@@ -75,7 +88,7 @@ export class AuthService {
 
     const refreshKeyPath = this.generateRefreshKeyPath(
       refreshToken.sub,
-      body.refreshToken,
+      body.refresh_token,
     )
     const session = await this.redis.get(refreshKeyPath)
     try {

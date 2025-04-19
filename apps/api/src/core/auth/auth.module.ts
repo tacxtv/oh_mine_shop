@@ -7,6 +7,7 @@ import { JwtStrategy } from './_strategies/jwt.strategy'
 import { MinecraftStrategy } from './_strategies/minecraft.strategy'
 import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
+import { LocalStrategy } from './_strategies/local.strategy'
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AuthService } from './auth.service'
     AuthService,
     JwtStrategy,
     MinecraftStrategy,
+    LocalStrategy,
   ],
 })
 export class AuthModule {

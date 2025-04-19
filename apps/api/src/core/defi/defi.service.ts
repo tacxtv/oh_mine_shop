@@ -6,6 +6,7 @@ import Redis from 'ioredis'
 import { InjectRedis } from '@nestjs-modules/ioredis'
 import { InjectRcon } from '@the-software-compagny/nestjs_module_rcon'
 import { Rcon } from 'rcon-client'
+import { existsSync, readFileSync } from 'node:fs'
 
 @Injectable()
 export class DefiService {
@@ -18,7 +19,7 @@ export class DefiService {
   ) {
   }
 
-  public async getCurrentDefi(player?: string): Promise<Defis & { _data: any, _playerMaxQuantity: number, _playerParticipation: any, _playerRank: number }> {
+  public async getCurrentDefi(player?: string): Promise<Defis & { _data?: any, _playerMaxQuantity?: number, _playerParticipation?: any, _playerRank?: number }> {
     const defi = await this._model.findOne({
       startAt: { $lte: new Date() },
       endAt: { $gte: new Date() },
@@ -34,11 +35,15 @@ export class DefiService {
       _data = JSON.parse(data).model
     } catch (error) {
     }
+    if (existsSync(`../../storage/render/${defi.itemId.replace(':', '__')}.png`)) {
+      const file = readFileSync(`../../storage/render/${defi.itemId.replace(':', '__')}.png`)
+      _data['texture'] = `data:image/png;base64,${file.toString('base64')}`
+    }
 
     let _playerMaxQuantity = undefined
     let _playerParticipation = undefined
     let _playerRank = undefined
-    if (!player) {
+    if (player) {
       _playerMaxQuantity = await this.quantityFromPlayerForDefi(player, defi.itemId)
       _playerParticipation = defi.participation.find((p) => p.player === player)
       _playerRank = defi.participation
@@ -89,6 +94,39 @@ export class DefiService {
     }
 
     return defi
+  }
+
+  public async getAllDefi(): Promise<(Defis & { _data?: any, _rank?: any })[]> {
+    const defis = await this._model.find().sort({ createdAt: -1 }).exec()
+
+    return await Promise.all(
+      defis.map(async (defi) => {
+        const data = await this._redis.get(`oms:items:${defi.itemId}`)
+        let _data = {}
+        try {
+          _data = JSON.parse(data).model
+        } catch (error) {
+        }
+
+        if (existsSync(`../../storage/render/${defi.itemId.replace(':', '__')}.png`)) {
+          const file = readFileSync(`../../storage/render/${defi.itemId.replace(':', '__')}.png`)
+          _data['texture'] = `data:image/png;base64,${file.toString('base64')}`
+        }
+
+        const _rank = defi.participation.sort((a, b) => b.amount - a.amount).map((p, i) => {
+          return {
+            ...p.toJSON(),
+            _position: i + 1,
+          }
+        })
+
+        return {
+          ...defi.toObject(),
+          _data,
+          _rank,
+        }
+      }),
+    )
   }
 
   private async quantityFromPlayerForDefi(player: string, itemId: string): Promise<number> {

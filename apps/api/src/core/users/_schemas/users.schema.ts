@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { UserState } from '../_enums/user-state.enum'
-import { UserCurrencyPart } from './_parts/currency.part.schema'
 import { Types } from 'mongoose'
 
 @Schema({
@@ -40,6 +39,18 @@ export class User {
     default: [],
   })
   public roles: string[]
+
+  @Prop({
+    type: [String],
+    default: [],
+  })
+  public staffRoles: string[]
+
+  @Prop({
+    type: String,
+    default: null,
+  })
+  public publicLink: string
 
   @Prop({
     type: Object,

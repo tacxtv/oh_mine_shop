@@ -29,6 +29,7 @@ export default {
     return {
       main: [
         { name: 'Accueil', to: '/', icon: 'mdi-view-dashboard' },
+        { name: 'Banque', to: '/bank', icon: 'mdi-bank' },
         { name: 'Hôtel de ventes', to: '/store', icon: 'mdi-store' },
         { name: 'Défis de la semaine', to: '/defi/upload', icon: 'mdi-bullseye-arrow' },
       ],

@@ -23,9 +23,6 @@
 
   img
     height: 65%
-    image-rendering: pixelated
-    image-rendering: -moz-crisp-edges
-    image-rendering: -o-crisp-edges
 
   img.no-texture:before
     content: ' '
@@ -37,6 +34,10 @@
     transform: translateX(-25px)
 
   &.big
+    image-rendering: pixelated
+    image-rendering: -moz-crisp-edges
+    image-rendering: -o-crisp-edges
+
     img.no-texture:before
       transform: translateX(-50%)
       height: 65%

@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
-import { RendezVous } from './_schemas/rendez-vous.schema'
 import { Model } from 'mongoose'
+import { RendezVous } from './_schemas/rendez-vous.schema'
 
 @Injectable()
 export class RendezVousService {

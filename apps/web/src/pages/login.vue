@@ -46,7 +46,7 @@ export default {
     }
 
     try {
-      await auth.loginWith('local', {
+      await auth.loginWith('minecraft', {
         redirect: 'manual',
         body: { ...route.query },
       })

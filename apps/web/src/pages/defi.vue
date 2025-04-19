@@ -13,8 +13,6 @@ export default {
     const $route = useRoute()
     const $router = useRouter()
 
-    console.log('route', $route.path.split('/')[2])
-
     if ($route.path === '/defi') {
       $router.replace('/defi/upload')
     }

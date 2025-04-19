@@ -77,6 +77,43 @@ export default defineNuxtConfig({
         },
         endpoints: {
           login: {
+            url: `/api/core/auth/local`,
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+          },
+          refresh: {
+            url: `/api/core/auth/refresh`,
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+          },
+          logout: { url: `/api/core/auth/logout`, method: 'post' },
+          user: { url: `/api/core/auth/session`, method: 'get' },
+        },
+        // @ts-ignore
+        redirect: {
+          logout: '/login',
+          login: '/',
+        },
+        tokenType: 'Bearer',
+        autoRefresh: true,
+      },
+      minecraft: {
+        scheme: 'refresh',
+        token: {
+          property: 'access_token',
+          maxAge: 60 * 5,
+        },
+        refreshToken: {
+          property: 'refresh_token',
+          data: 'refresh_token',
+          maxAge: 60 * 60 * 4,
+        },
+        user: {
+          property: 'user',
+          autoFetch: true,
+        },
+        endpoints: {
+          login: {
             url: `/api/core/auth/minecraft`,
             method: 'post',
             headers: { 'Content-Type': 'application/json' },

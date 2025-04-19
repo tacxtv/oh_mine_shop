@@ -16,6 +16,8 @@
             label="Quantité"
             :min='0'
             :max='getPlayerMaxQuantity'
+            :error="!quantity || quantity <= 0"
+            error-message="Vous devez posséder au moins 1 item dans votre inventaire pour participer !"
             filled
             :style='{ width: "35vw" }'
           )
@@ -49,11 +51,11 @@
           div
             p Votre position
             .slot.medium.cursor-pointer-none
-              span(v-text='"#" + defi._playerRank')
+              span(v-text='"#" + (defi._playerRank || "0")')
           div
             p Votre participation
             .slot.medium.cursor-pointer-none
-              span(v-text='defi._playerParticipation?.amount')
+              span(v-text='defi._playerParticipation?.amount || "0"')
 </template>
 
 <script lang="ts">
@@ -65,11 +67,17 @@ export default {
     }
   },
   async setup() {
+    const getUsername = computed(() => {
+      const $auth = useAuth()
+
+      return $auth.user?.name
+    })
+
     const {
       data: defi,
       refresh,
       error,
-    } = await useHttp<any>('/core/defi/current/Tacxounet', {
+    } = await useHttp<any>('/core/defi/current/' + getUsername.value, {
       transform: (result) => {
         return result?.data || {}
       },
@@ -82,6 +90,8 @@ export default {
       defi,
       refresh,
 
+      getUsername,
+
       quantity,
     }
   },
@@ -93,7 +103,7 @@ export default {
       return this.defi._data?.name
     },
     getPlayerMaxQuantity() {
-      return this.defi._playerMaxQuantity
+      return this.defi._playerMaxQuantity || 0
     },
     getRemainingTime() {
       const endTime = new Date(this.defi.endAt)
@@ -115,11 +125,6 @@ export default {
       const seconds = Math.floor((diff % (1000 * 60)) / 1000)
 
       return `${days}j ${hours}h ${minutes}m ${seconds}s`
-    },
-    getUsername() {
-      const $auth = useAuth()
-
-      return $auth.user?.name
     },
   },
   methods: {

@@ -35,10 +35,10 @@ export class Article {
 
   @Prop({
     type: Number,
-    required: [true, 'Article amount of default currency is required'],
+    required: [true, 'Article price is required'],
     min: 1,
   })
-  public amount: number
+  public price: number
 
   @Prop({
     type: Object,
