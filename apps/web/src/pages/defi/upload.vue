@@ -1,6 +1,6 @@
 <template lang="pug">
   q-card(flat :style="{ flex: 1 }")
-    .fit.flex
+    .fit.flex(v-if="defi")
       .flex.justify-center.items-center.column(:style='{flex: 1}')
         .slot.big.cursor-pointer
           img.non-selectable(
@@ -51,11 +51,21 @@
           div
             p Votre position
             .slot.medium.cursor-pointer-none
-              span(v-text='"#" + (defi._playerRank || "0")')
+              span(v-text='"#" + (defi?._playerRank || "0")')
           div
             p Votre participation
             .slot.medium.cursor-pointer-none
-              span(v-text='defi._playerParticipation?.amount || "0"')
+              span(v-text='defi?._playerParticipation?.amount || "0"')
+    div(v-else-if="error")
+      .flex.justify-center.items-center.column
+        q-card-section.text-center
+          q-icon(name='mdi-alert-circle' size='50px' color='red')
+          p(v-text='"Erreur lors du chargement du défi"')
+    div(v-else)
+      .flex.justify-center.items-center.column
+        q-card-section.text-center
+          q-spinner-dots(size='50px' color='purple')
+          p(v-text='"Chargement du défi..."')
 </template>
 
 <script lang="ts">
@@ -97,16 +107,16 @@ export default {
   },
   computed: {
     getItemTexture() {
-      return this.defi._data?.texture
+      return this.defi?._data?.texture
     },
     getItemTitle() {
-      return this.defi._data?.name
+      return this.defi?._data?.name
     },
     getPlayerMaxQuantity() {
-      return this.defi._playerMaxQuantity || 0
+      return this.defi?._playerMaxQuantity || 0
     },
     getRemainingTime() {
-      const endTime = new Date(this.defi.endAt)
+      const endTime = new Date(this.defi?.endAt)
       const diff = endTime.getTime() - this.now.getTime()
 
       if (diff <= 0) {

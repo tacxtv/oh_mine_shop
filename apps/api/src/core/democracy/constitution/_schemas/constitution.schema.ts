@@ -4,7 +4,6 @@ import { ConstitutionMetadataPart, ConstitutionMetadataPartSchema } from './_par
 @Schema({
   collection: 'constitution',
   versionKey: false,
-  timestamps: true,
 })
 export class Constitution {
   @Prop({

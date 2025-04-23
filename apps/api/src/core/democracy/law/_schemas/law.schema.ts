@@ -46,7 +46,11 @@ export class Law {
   @Prop({
     type: Date,
     required: [true, 'Law applied date is required'],
-    default: () => new Date(),
+    default: () => {
+      const date = new Date()
+      date.setDate(date.getDate() + 1) // 24h after the vote
+      return date
+    },
   })
   public appliedAt: Date // 24h after the vote
 

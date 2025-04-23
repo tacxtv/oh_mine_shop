@@ -1,10 +1,14 @@
-import { Prop, SchemaFactory } from '@nestjs/mongoose'
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document } from 'mongoose'
 
+@Schema({
+  _id: false,
+})
 export class ConstitutionMetadataPart extends Document {
   @Prop({
     type: Date,
     required: [true, 'Constitution on proposal date is required'],
+    default: () => new Date(),
   })
   public onProposalAt: Date
 

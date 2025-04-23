@@ -61,8 +61,9 @@ export class PlayerService {
         try {
           // Attempt to fetch individual inventory slots
           Inventory[i] = await this.getPlayerData<T>(playerName, `Inventory[${i}]`)
-        } catch (error) {
+        } catch (err) {
           // Stop fetching when no more items are found
+          console.log(`No more items found in inventory at index ${error}. Stopping fetch.`)
           break
         }
       }

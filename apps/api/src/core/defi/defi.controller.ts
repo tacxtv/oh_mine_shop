@@ -1,4 +1,4 @@
-import { All, Controller, Get, HttpStatus, Param, ParseIntPipe, Post, Req, Res } from '@nestjs/common'
+import { All, Body, Controller, Delete, Get, HttpStatus, Param, ParseIntPipe, Post, Req, Res } from '@nestjs/common'
 import { DefiService } from './defi.service'
 import { Request, Response } from 'express'
 import { Public } from '~/_common/_decorators/public.decorator'
@@ -70,21 +70,19 @@ export class DefiController {
     })
   }
 
-  @Get('create')
+  @Post('create')
   @HasRoles('op')
   public async createDefi(
     @Res() res: Response,
+    @Body() body: any,
   ): Promise<Response> {
     return res.status(HttpStatus.CREATED).json({
       statusCode: HttpStatus.CREATED,
-      data: await this._service.createDefi({
-        name: 'Test Defi',
-        itemId: 'create:mechanical_harvester',
-      }),
+      data: await this._service.createDefi(body),
     })
   }
 
-  @Get('delete')
+  @Delete('delete')
   @HasRoles('op')
   public async deleteDefi(
     @Res() res: Response,

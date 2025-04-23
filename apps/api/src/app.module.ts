@@ -10,9 +10,10 @@ import { MongooseModule, MongooseModuleOptions } from '@nestjs/mongoose'
 import { RedisOptions } from 'ioredis'
 import { RedisModule } from '@nestjs-modules/ioredis'
 import { ScheduleModule } from '@nestjs/schedule'
-import { APP_GUARD } from '@nestjs/core'
+import { APP_FILTER, APP_GUARD } from '@nestjs/core'
 import { AuthGuard } from './_common/_guards/auth.guard'
 import { RolesGuard } from './_common/_guards/roles.guard'
+import { MongooseValidationFilter } from './_common/_filters/mongoose-validation.filter'
 
 @Module({
   imports: [
@@ -61,6 +62,10 @@ import { RolesGuard } from './_common/_guards/roles.guard'
     {
       provide: APP_GUARD,
       useClass: RolesGuard,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: MongooseValidationFilter,
     },
   ],
 })

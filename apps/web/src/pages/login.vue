@@ -42,6 +42,7 @@ export default {
 
     if (!route.query.code) {
       window.location.href = '/api/core/auth/minecraft'
+      debugger
       return
     }
 
@@ -58,7 +59,7 @@ export default {
         errorText.value = error.response?._data?.message || error.message
 
         if (error!.response!.status >= 500) {
-          await router.push('/login')
+          // await router.push('/login')
           router.go(0)
 
           return
