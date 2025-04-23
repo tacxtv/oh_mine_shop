@@ -25,7 +25,7 @@ export class DefiController {
     @Req() req: Request,
     @Param('player') player: string,
   ): Promise<Response> {
-    if ((req.user as any).name !== player || !(req.user as any).roles.includes('op')) {
+    if ((req.user as any).name !== player && !(req.user as any).roles.includes('op')) {
       return res.status(HttpStatus.FORBIDDEN).json({
         statusCode: HttpStatus.FORBIDDEN,
         message: 'You are not allowed to participate in this defi',

@@ -75,7 +75,7 @@ export default {
           persistent: true,
         })
         .onOk(async () => {
-          await $http.$post('/core/defi/delete', {
+          await $http.$delete('/core/defi/delete', {
             body: {
               id: row._id,
             },
