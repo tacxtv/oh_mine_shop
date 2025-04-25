@@ -38,60 +38,60 @@ export class UsersService {
     this.logger.verbose('UsersService initialized 🔴')
   }
 
-  @Interval(1_000 * 60 * 5)
-  private async handleIntervalWhitelist() {
-    const regex = /(\d+)\swhitelisted\splayer\(s\):\s(.+)/
-    const list = await this._rcon.send('whitelist list')
-    const matched = list.match(regex)
-    let playersList: string[] = []
+  // @Interval(1_000 * 60 * 5)
+  // private async handleIntervalWhitelist() {
+  //   const regex = /(\d+)\swhitelisted\splayer\(s\):\s(.+)/
+  //   const list = await this._rcon.send('whitelist list')
+  //   const matched = list.match(regex)
+  //   let playersList: string[] = []
 
-    if (matched) {
-      const [_, total, players] = matched
-      this.logger.verbose(`Whitelist list: ${total} players`)
-      playersList = players.split(', ')
+  //   if (matched) {
+  //     const [_, total, players] = matched
+  //     this.logger.verbose(`Whitelist list: ${total} players`)
+  //     playersList = players.split(', ')
 
-      for (const player of playersList) {
-        const user = await this.userModel.findOne({ name: player })
-        if (!user) {
-          this.logger.warn(`Player ${player} not found in database, removing from whitelist !`)
-          await this._rcon.send(`whitelist remove ${player}`)
-          continue
-        }
+  //     for (const player of playersList) {
+  //       const user = await this.userModel.findOne({ name: player })
+  //       if (!user) {
+  //         this.logger.warn(`Player ${player} not found in database, removing from whitelist !`)
+  //         await this._rcon.send(`whitelist remove ${player}`)
+  //         continue
+  //       }
 
-        if (user.state !== UserState.WHITELISTED) {
-          this.logger.warn(`Player ${player} is not whitelisted, adding whitelist state to database !`)
-          this.userModel.updateOne(
-            { name: player },
-            { $set: { state: UserState.WHITELISTED } },
-          ).exec()
-          continue
-        }
-      }
+  //       if (user.state !== UserState.WHITELISTED) {
+  //         this.logger.warn(`Player ${player} is not whitelisted, adding whitelist state to database !`)
+  //         this.userModel.updateOne(
+  //           { name: player },
+  //           { $set: { state: UserState.WHITELISTED } },
+  //         ).exec()
+  //         continue
+  //       }
+  //     }
 
-      const users = await this.userModel.find({ state: UserState.WHITELISTED })
-      for (const user of users) {
-        if (playersList.includes(user.name)) {
-          this.logger.debug(`Player ${user.name} is already whitelisted !`)
-          continue
-        }
-        this.logger.warn(`Adding player ${user.name} to whitelist !`)
-        await this._rcon.send(`whitelist add ${user.name}`)
-      }
-    }
+  //     const users = await this.userModel.find({ state: UserState.WHITELISTED })
+  //     for (const user of users) {
+  //       if (playersList.includes(user.name)) {
+  //         this.logger.debug(`Player ${user.name} is already whitelisted !`)
+  //         continue
+  //       }
+  //       this.logger.warn(`Adding player ${user.name} to whitelist !`)
+  //       await this._rcon.send(`whitelist add ${user.name}`)
+  //     }
+  //   }
 
-    this.logger.verbose('Verifying users from database to whitelist...')
-    const users = await this.userModel.find({ state: UserState.WHITELISTED })
-    for (const user of users) {
-      if (playersList.includes(user.name)) {
-        this.logger.debug(`Player ${user.name} is already whitelisted !`)
-        continue
-      }
-      this.logger.warn(`Adding player ${user.name} to whitelist !`)
-      await this._rcon.send(`whitelist add ${user.name}`)
-    }
+  //   this.logger.verbose('Verifying users from database to whitelist...')
+  //   const users = await this.userModel.find({ state: UserState.WHITELISTED })
+  //   for (const user of users) {
+  //     if (playersList.includes(user.name)) {
+  //       this.logger.debug(`Player ${user.name} is already whitelisted !`)
+  //       continue
+  //     }
+  //     this.logger.warn(`Adding player ${user.name} to whitelist !`)
+  //     await this._rcon.send(`whitelist add ${user.name}`)
+  //   }
 
-    this.logger.verbose('endof <handleIntervalWhitelist> !')
-  }
+  //   this.logger.verbose('endof <handleIntervalWhitelist> !')
+  // }
 
   public async findOne(query: object, projection?: object): Promise<User> {
     return this.userModel.findOne(query, projection).exec()
