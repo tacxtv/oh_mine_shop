@@ -33,7 +33,9 @@ export default {
         // { name: 'Hôtel de ventes', to: '/store', icon: 'mdi-store' },
         // { name: 'Défis de la semaine', to: '/defi/upload', icon: 'mdi-bullseye-arrow' },
       ],
-      bottom: [{ name: 'Inventaire', to: '/inventory', icon: 'mdi-archive' }],
+      bottom: [
+        // { name: 'Inventaire', to: '/inventory', icon: 'mdi-archive' }
+      ],
     }
   },
   setup() {
