@@ -4,6 +4,7 @@ import { ArticleController } from './article.controller'
 import { MongooseModule } from '@nestjs/mongoose'
 import { Article, ArticleSchema } from './_schemas/article.schema'
 import { UsersModule } from '../users/users.module'
+import { ItemModule } from '~/minecraft/item/item.module'
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UsersModule } from '../users/users.module'
       },
     ]),
     UsersModule,
+    ItemModule,
   ],
   controllers: [ArticleController],
   providers: [ArticleService],

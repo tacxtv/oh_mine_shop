@@ -5,11 +5,12 @@ import { Model } from 'mongoose'
 import { ArticleState } from './_enums/article-state.enum'
 import Redis from 'ioredis'
 import { InjectRedis } from '@nestjs-modules/ioredis'
-import { User } from '../users/_schemas/users.schema'
 import { UsersService } from '../users/users.service'
 import { Rcon } from 'rcon-client'
 import { InjectRcon } from '@the-software-compagny/nestjs_module_rcon'
 import { parse, stringify } from 'nbt-ts'
+import { existsSync, readFileSync } from 'fs'
+import { ItemService } from '~/minecraft/item/item.service'
 
 @Injectable()
 export class ArticleService {
@@ -18,19 +19,14 @@ export class ArticleService {
     @InjectRedis() private readonly _redis: Redis,
     @InjectRcon() private readonly _rcon: Rcon,
     private readonly _users: UsersService,
+    private readonly _item: ItemService,
   ) { }
 
-  public async findAveragePrice(filters?: {}) {
-    for (const filter in filters) {
-      const value = filters[filter]
-      if (value === '') continue
-      try {
-        const regex = new RegExp(value, 'i')
-        filters[filter] = regex
-      } catch (e) { }
-    }
-
+  public async findAveragePrice(mod: string) {
+    let filters = {}
     filters['state'] = ArticleState.SELLED
+    filters['name'] = new RegExp('^' + mod, 'i')
+
     const items = await this._model.aggregate([
       { $match: filters },
       {
@@ -58,17 +54,11 @@ export class ArticleService {
     return items
   }
 
-  public async findBestPrice(filters = {}) {
-    for (const filter in filters) {
-      const value = filters[filter]
-      if (value === '') continue
-      try {
-        const regex = new RegExp(value, 'i')
-        filters[filter] = regex
-      } catch (e) { }
-    }
-
+  public async findBestPrice(mod: string) {
+    let filters = {}
     filters['state'] = ArticleState.ON_SALE
+    filters['name'] = new RegExp('^' + mod, 'i')
+
     const items = await this._model.aggregate([
       { $match: filters },
       {
@@ -81,6 +71,7 @@ export class ArticleService {
           _id: { name: '$name', stack: '$stack', nbt: '$nbt', state: '$state' },
           price: { $min: '$price' },
           quantity: { $sum: 1 },
+          onSaleAt: { $max: '$metadata.onSaleAt' },
         },
       },
       {
@@ -94,9 +85,15 @@ export class ArticleService {
               quantity: '$quantity',
               state: '$state',
               price: '$price',
+              'onSaleAt': '$onSaleAt'
             },
           },
           // stack: '$stack',
+        },
+      },
+      {
+        $sort: {
+          '_id': 1,
         },
       },
     ])
@@ -109,8 +106,23 @@ export class ArticleService {
 
     return await Promise.all(
       items.map(async (item) => {
+        let _data = {}
+        const data = await this._redis.get(`oms:items:${item.id}`)
+        try {
+          _data = JSON.parse(data).model
+        } catch (error) {
+        }
+
+        if (existsSync(`../../storage/render/${item._id.replace(':', '__')}.png`)) {
+          const file = readFileSync(`../../storage/render/${item._id.replace(':', '__')}.png`)
+          _data['texture'] = `data:image/png;base64,${file.toString('base64')}`
+        }
+
         return {
           ...item,
+          name: item._id.split(':')[1],
+          mod: item._id.split(':')[0],
+          _data,
         }
       }),
     )
@@ -150,8 +162,9 @@ export class ArticleService {
         $inc: { money: -taxe },
       })
     const result = await this._rcon.send(command)
+    console.log('result', result)
     if (
-      !result.includes(`Removed ${options.quantity} items from player ${name}`)
+      !result.includes(`Removed ${options.quantity} item(s) from player ${name}`)
     ) {
       await this._model.findByIdAndDelete(data._id)
       throw new MethodNotAllowedException()
@@ -167,9 +180,9 @@ export class ArticleService {
     const prefix = `${name} has the following entity data: `
     const dim = await this._rcon.send(`data get entity ${name} Dimension`)
     if (dim.includes('No entity was found')) throw new NotFoundException()
-    const dimData = parse(dim.replace(prefix, '').replace('\n', ''))
-    if (dimData !== 'multiworld:miratopia')
-      throw new MethodNotAllowedException()
+    // const dimData = parse(dim.replace(prefix, '').replace('\n', ''))
+    // if (dimData !== 'multiworld:miratopia')
+    //   throw new MethodNotAllowedException()
     const command = `data get entity ${name} ${pos}`
     const result = await this._rcon.send(command)
     if (result.includes('No entity was found')) throw new NotFoundException()
@@ -186,5 +199,94 @@ export class ArticleService {
     }
     // console.log('tag', tag)
     return tag
+  }
+
+  public async getMods() {
+    // add total count of mod items, name contains ':' and first part of name is the mod name
+    const items = await this._model.aggregate([
+      {
+        $match: {
+          name: { $regex: /:/ },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $substr: ['$name', 0, { $indexOfBytes: ['$name', ':'] }],
+          },
+          items: {
+            $addToSet: '$name',
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          count: { $size: '$items' },
+        },
+      },
+    ])
+
+    const mods = (await this._item.getMods()).map((mod) => {
+      const item = items.find((item) => item._id === mod)
+      if (!item) return { name: mod, count: 0 }
+
+      return {
+        name: mod,
+        count: item.count,
+        mod: item.mod,
+      }
+    }).sort((a, b) => {
+      if (a.count > b.count) return -1
+      if (a.count < b.count) return 1
+      return 0
+    })
+
+    return mods
+  }
+
+  public async buyItem(
+    player: string,
+    id: string,
+    options = { price: 1, stack: 1, nbt: null },
+  ) {
+    const data = await this._model.findOne<Article>({
+      name: id,
+      stack: options.stack,
+      price: options.price,
+      nbt: options.nbt,
+    })
+
+    const EnderItems = (await this.findByName(player, 'EnderItems')) || []
+
+    const sortedEnderItems = []
+    for (let i = 0; i < 26; i++) {
+      const filter = EnderItems.filter((item) => item.Slot.value === i)
+      if (filter[0]) {
+        sortedEnderItems.push(filter[0])
+      } else {
+        sortedEnderItems.push({ Slot: { value: i } })
+      }
+    }
+
+    for (let i = 0; i < 29; i++) {
+      if (sortedEnderItems[i].id) continue
+      const result = await this._rcon.send(
+        `item replace entity ${player} enderchest.${i} with ${id}${stringify(
+          data.nbt || ({} as any),
+        )} ${data.stack}`,
+      )
+      if (
+        result.includes(
+          `Replaced a slot on ${player}`,
+        )
+      ) {
+        await this._users.findByIdAndUpdate(data._id, {
+          'metadata.purchaseBy': player,
+          'metadata.selledAt': new Date(),
+        })
+      }
+      return { result }
+    }
   }
 }

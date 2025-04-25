@@ -1,5 +1,5 @@
 import { InjectRedis } from '@nestjs-modules/ioredis'
-import { Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { InjectRcon } from '@the-software-compagny/nestjs_module_rcon'
 import Redis from 'ioredis'
 import { Byte, Int, parse, Tag } from 'nbt-ts'
@@ -16,6 +16,8 @@ import { existsSync, readFileSync } from 'node:fs'
 
 @Injectable()
 export class PlayerService {
+  private readonly logger = new Logger(PlayerService.name)
+
   public constructor(
     @InjectRcon() private rcon: Rcon,
     @InjectRedis() private readonly _redis: Redis,
@@ -56,6 +58,12 @@ export class PlayerService {
       // Attempt to fetch the entire inventory at once
       Inventory = await this.getPlayerData<T[]>(playerName, 'Inventory')
     } catch (error) {
+      if (error.message.includes('not logged?')) {
+        throw new NotFoundException('Player not logged in')
+      }
+
+      this.logger.warn(`Failed to fetch inventory for ${playerName}. Error: ${error} ! Trying to fetch items one by one...`)
+
       // If fetching the whole inventory fails, retrieve items one by one
       for (let i = 0; i < 36; i++) {
         try {
@@ -63,7 +71,8 @@ export class PlayerService {
           Inventory[i] = await this.getPlayerData<T>(playerName, `Inventory[${i}]`)
         } catch (err) {
           // Stop fetching when no more items are found
-          console.log(`No more items found in inventory at index ${error}. Stopping fetch.`)
+          // if (i )
+          this.logger.log(`No more items found in inventory at index ${error}. Stopping fetch.`)
           break
         }
       }

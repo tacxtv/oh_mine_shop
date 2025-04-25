@@ -57,7 +57,7 @@ export class MinecraftStrategy extends PassportStrategy(Strategy, 'minecraft') {
   ) {
     super({
       ..._config.get('passport.strategies.minecraft'),
-      authorizationURL: 'https://login.live.com/oauth20_authorize.srf?prompt=select_account',
+      // authorizationURL: 'https://login.live.com/oauth20_authorize.srf?prompt=select_account',
       passReqToCallback: true,
       session: false,
     })

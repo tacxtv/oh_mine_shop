@@ -7,6 +7,8 @@ import { Types } from 'mongoose'
   versionKey: false,
 })
 export class User {
+  public readonly _id: Types.ObjectId
+
   @Prop({
     type: String,
     required: [true, 'User id is required'],

@@ -8,7 +8,7 @@
           q-select(v-model="formData.stack" label="Stack" :options='[1, 16, 64]' outlined)
       .row.q-col-gutter-md.q-mb-md
         .col-12.col-md-6
-          q-input(v-model="formData.price" label="Prix de vente" type="number" outlined)
+          q-input(v-model="formData.price" label="Prix de vente" type="number" step="1" outlined)
         .col-12.col-md-6
           q-input(v-model="formData.price" label="Prix moyen /stack" type="number" readonly outlined)
 
@@ -21,7 +21,7 @@
   q-card-actions
     q-space
     q-btn(label="Annuler" color="negative" @click="$router.replace('/inventory')" flat)
-    q-btn(label="Mettre en vente !" color="positive" @click="")
+    q-btn(label="Mettre en vente !" color="positive" @click="sell")
 </template>
 
 <script lang="ts">
@@ -31,6 +31,50 @@ export default {
     formData: {
       type: Object,
       required: true,
+    },
+    slot: {
+      type: Number,
+      required: true,
+    },
+    refresh: {
+      type: Function,
+      required: true,
+    },
+  },
+  async setup() {
+    const getUsername = computed(() => {
+      const $auth = useAuth()
+
+      return $auth.user?.name
+    })
+
+    return {
+      getUsername,
+    }
+  },
+  methods: {
+    async sell() {
+      try {
+        await useHttp(`/core/article/${this.getUsername}/sell/${this.slot}`, {
+          method: 'POST',
+          body: {
+            stack: this.formData.stack,
+            price: this.formData.price,
+          },
+        })
+        this.$q.notify({
+          type: 'positive',
+          message: 'Objet mis en vente !',
+        })
+        this.$router.replace('/inventory')
+        this.refresh()
+      } catch (error) {
+        console.error('Error selling item:', error)
+        this.$q.notify({
+          type: 'negative',
+          message: "Erreur lors de la vente de l'objet",
+        })
+      }
     },
   },
 }

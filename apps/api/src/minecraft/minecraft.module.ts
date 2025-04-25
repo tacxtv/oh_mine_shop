@@ -7,7 +7,7 @@ import { ItemModule } from './item/item.module'
 
 @Module({
   imports: [
-    // ItemModule,
+    ItemModule,
     PlayerModule,
   ],
   controllers: [MinecraftController],

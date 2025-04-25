@@ -5,7 +5,7 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Interval } from '@nestjs/schedule'
 import { InjectRcon } from '@the-software-compagny/nestjs_module_rcon'
 import Redis from 'ioredis'
-import { FlattenMaps, Model } from 'mongoose'
+import { FlattenMaps, Model, Types } from 'mongoose'
 import { omit } from 'radash'
 import { Rcon } from 'rcon-client'
 import { firstValueFrom } from 'rxjs'
@@ -65,6 +65,16 @@ export class UsersService {
           ).exec()
           continue
         }
+      }
+
+      const users = await this.userModel.find({ state: UserState.WHITELISTED })
+      for (const user of users) {
+        if (playersList.includes(user.name)) {
+          this.logger.debug(`Player ${user.name} is already whitelisted !`)
+          continue
+        }
+        this.logger.warn(`Adding player ${user.name} to whitelist !`)
+        await this._rcon.send(`whitelist add ${user.name}`)
       }
     }
 
@@ -172,7 +182,7 @@ export class UsersService {
   }
 
   public async findByIdAndUpdate(
-    id: string,
+    id: string | Types.ObjectId,
     payload: any,
     options?: any,
   ) {

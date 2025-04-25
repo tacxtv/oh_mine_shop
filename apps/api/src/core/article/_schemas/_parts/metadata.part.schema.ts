@@ -12,4 +12,9 @@ export class ArticleMetadataPart extends Document {
     type: Date,
   })
   public selledAt?: Date
+
+  @Prop({
+    type: String,
+  })
+  public purchaseBy?: string
 }

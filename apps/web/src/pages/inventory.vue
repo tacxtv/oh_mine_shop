@@ -86,7 +86,7 @@
 
       q-separator.q-my-md
 
-      nuxt-page(:formData='formData')
+      nuxt-page(:formData='formData' :slot='slot' :refresh='refresh')
 </template>
 
 <script lang="ts">
@@ -174,7 +174,7 @@ export default {
       this.fillFormData(this.getItemData(this.slot))
     },
     fillFormData(data: any) {
-      const { id, Count, _data, _averagePrice, tag } = data
+      const { id, Count, _averagePrice, tag } = data
 
       this.formData.item = id
       this.formData.stack = Count >= 64 ? 64 : Count >= 16 ? 16 : 1
