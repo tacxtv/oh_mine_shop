@@ -34,7 +34,7 @@ export class UsersService {
     @InjectRedis() private readonly _redis: Redis,
     @InjectRcon() private _rcon: Rcon,
   ) {
-    this.handleIntervalWhitelist()
+    // this.handleIntervalWhitelist()
     this.logger.verbose('UsersService initialized 🔴')
   }
 

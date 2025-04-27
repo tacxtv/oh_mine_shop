@@ -54,22 +54,22 @@ export const validationSchema = Joi.object({
     .uri({ scheme: ['http', 'https'] })
     .required(),
 
-  OMG_SERVER_SFTP_HOST: Joi
-    .string()
-    .ip()
-    .default('localhost'),
+  // OMG_SERVER_SFTP_HOST: Joi
+  //   .string()
+  //   .ip()
+  //   .default('localhost'),
 
-  OMG_SERVER_SFTP_PORT: Joi
-    .number()
-    .default(22),
+  // OMG_SERVER_SFTP_PORT: Joi
+  //   .number()
+  //   .default(22),
 
-  OMG_SERVER_SFTP_USERNAME: Joi
-    .string()
-    .required(),
+  // OMG_SERVER_SFTP_USERNAME: Joi
+  //   .string()
+  //   .required(),
 
-  OMG_SERVER_SFTP_PASSWORD: Joi
-    .string()
-    .required(),
+  // OMG_SERVER_SFTP_PASSWORD: Joi
+  //   .string()
+  //   .required(),
 })
 
 export interface ConfigInstance {
