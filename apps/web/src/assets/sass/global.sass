@@ -13,6 +13,10 @@
   background: gray
   border-radius: 5px
 
+  &.middle
+    width: 15vw
+    height: 15vw
+
   &.big
     width: 30vw
     height: 30vw
@@ -32,6 +36,16 @@
     width: 50px
     background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbDpzcGFjZT0icHJlc2VydmUiIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48cGF0aCBkPSJNNDc4LjYgMTY3di02Ni44aC0zMy40VjY2LjhoLTMzLjRWMzMuNEgzNDVWMEgxNjd2MzMuNGgtNjYuOHYzMy40SDY2Ljh2MzMuNEgzMy40VjE2N0gwdjE3OGgzMy40djY2LjhoMzMuNHYzMy40aDMzLjR2MzMuNEgxNjdWNTEyaDE3OHYtMzMuNGg2Ni44di0zMy40aDMzLjR2LTMzLjRoMzMuNFYzNDVINTEyVjE2N3pNMjY3LjEgNDExLjhoLTMzLjR2LTMzLjRoMzMuNHptNzgtMTY3aC0zMy40djMzLjVIMjY3VjM0NWgtMzMuNHYtNjYuN0gyNjd2LTMzLjRoNDQuNlYxMzMuNkgxODkuMnY2Ni43aC0zMy40di02Ni43aDMzLjR2LTMzLjRoMTIyLjV2MzMuNEgzNDV6Ii8+PC9zdmc+")
     transform: translateX(-25px)
+
+  &.middle
+    image-rendering: pixelated
+    image-rendering: -moz-crisp-edges
+    image-rendering: -o-crisp-edges
+
+    img.no-texture:before
+      transform: translateX(-50%)
+      height: 45%
+      width: 45%
 
   &.big
     image-rendering: pixelated

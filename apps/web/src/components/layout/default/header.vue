@@ -15,6 +15,9 @@ q-header.q-pa-md.bg-white(
             q-btn.lt-sm(icon="mdi-menu" color="white" @click="drawer = !drawer" flat dense)
           q-toolbar.q-gutter-sm
             q-space
+            q-item-label.text-h6.text-white
+              small {{ getCurrency }}
+              q-icon.q-ml-xs(name="mdi-cash" class="q-mr-sm")
             q-btn.gt-xs(icon="mdi-refresh" color='warning' v-if='hasRole("op")' @click="refreshAuthToken()" flat dense)
             q-btn.gt-xs(icon="mdi-theme-light-dark" @click="$q.dark.toggle()" flat dense)
             q-btn-dropdown(flat dense)
@@ -73,6 +76,11 @@ export default {
       const $auth = useAuth()
 
       return $auth.user?.name
+    },
+    getCurrency() {
+      const $auth = useAuth()
+
+      return $auth.user?.currency
     },
     getAvatar() {
       const $auth = useAuth()

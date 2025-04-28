@@ -1,6 +1,6 @@
 import { InjectRedis } from '@nestjs-modules/ioredis'
 import { HttpService } from '@nestjs/axios'
-import { Injectable, Logger, UnauthorizedException } from '@nestjs/common'
+import { BadRequestException, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Interval } from '@nestjs/schedule'
 import { InjectRcon } from '@the-software-compagny/nestjs_module_rcon'
@@ -12,6 +12,8 @@ import { firstValueFrom } from 'rxjs'
 import { MinecraftProfile } from '../auth/_strategies/minecraft.strategy'
 import { UserState } from './_enums/user-state.enum'
 import { User } from './_schemas/users.schema'
+import { existsSync, readFileSync } from 'node:fs'
+import { PlayerService } from '~/minecraft/player/player.service'
 
 interface UserMetadata {
   id: string;
@@ -95,6 +97,127 @@ export class UsersService {
 
   public async findOne(query: object, projection?: object): Promise<User> {
     return this.userModel.findOne(query, projection).exec()
+  }
+
+  private async quantityFromPlayerForCurrency(player: string): Promise<number> {
+    const itemIds = {
+      'miramod:mirex': 1,
+      'miramod:mirex_bundle': 8,
+      'miramod:money': 64,
+      'miramod:money_bundle': 512,
+    }
+
+    let total = 0
+    for (const itemId of Object.keys(itemIds)) {
+      const res = await this._rcon.send(`clear ${player} ${itemId} 0`)
+      const regex = /^Found\s([\d]+)\smatching.*$/
+      const matched = res.replace('\n', '').match(regex)
+
+      if (matched) {
+        const quantity = parseInt(matched[1], 10)
+        total += quantity * itemIds[itemId]
+      }
+    }
+
+    return total
+  }
+
+  public async getCurrency(name: string): Promise<any> {
+    const user = await this.userModel.findOne({ name }).exec()
+    if (!user) {
+      throw new NotFoundException('User not found')
+    }
+
+    let _data = {}
+    if (existsSync(`../../storage/render/${'miramod__money_bundle_ground'.replace(':', '__')}.png`)) {
+      const file = readFileSync(`../../storage/render/${'miramod__money_bundle_ground'.replace(':', '__')}.png`)
+      _data['texture'] = `data:image/png;base64,${file.toString('base64')}`
+    }
+
+    const _currencyFromInventory = await this.quantityFromPlayerForCurrency(name)
+
+    let _extra_claim_chunks = 0
+    const extra = await this._rcon.send(`ftbchunks admin extra_claim_chunks ${name} get`)
+    const regex = new RegExp(`${name}/extra_claim_chunks\\s=\\s([0-9]+)$`, 'i')
+    const matched = extra.match(regex)
+    if (matched) {
+      _extra_claim_chunks += parseInt(matched[1], 10)
+    }
+    const _nextPrice = Math.round(8192 * (1 + 0.04 * _extra_claim_chunks))
+
+    return {
+      _nextPrice,
+      _extra_claim_chunks: _extra_claim_chunks + 25,
+      _currencyFromInventory,
+      currentCurrency: user.currency,
+      _data,
+    }
+  }
+
+  public async uploadCurrency(name: string, amount: number): Promise<void> {
+    const itemIds = [
+      'miramod:mirex',
+      'miramod:mirex_bundle',
+      'miramod:money',
+      'miramod:money_bundle',
+    ]
+
+    const user = await this.userModel.findOne({ name }).exec()
+    if (!user) {
+      throw new NotFoundException('User not found')
+    }
+    const _currencyFromInventory = await this.quantityFromPlayerForCurrency(name)
+    if (_currencyFromInventory !== amount) {
+      throw new BadRequestException('User has not the same amount of currency in inventory')
+    }
+
+    for (const itemId of itemIds) {
+      await this._rcon.send(`clear ${name} ${itemId}`)
+    }
+    await this.userModel.findOneAndUpdate(
+      { name },
+      { $inc: { currency: amount } },
+      { new: true },
+    ).exec()
+    this.logger.verbose(`User ${name} has been updated with ${amount} currency`)
+  }
+
+  public async buyChunk(name: string, amount: number): Promise<string> {
+    const user = await this.userModel.findOne({ name }).exec()
+    if (!user) {
+      throw new NotFoundException('User not found')
+    }
+
+    let _extra_claim_chunks = 0
+    const extra = await this._rcon.send(`ftbchunks admin extra_claim_chunks ${name} get`)
+    const regex1 = new RegExp(`${name}/extra_claim_chunks\\s=\\s([0-9]+)$`, 'i')
+    const matched1 = extra.match(regex1)
+    if (matched1) {
+      _extra_claim_chunks += parseInt(matched1[1], 10)
+    }
+
+    /// base price 8192, with 4percent increase per chunk
+    const price = Math.round(8192 * (1 + 0.04 * _extra_claim_chunks))
+
+    if (user.currency < price) {
+      throw new BadRequestException('User has not enough currency')
+    }
+
+    const res = await this._rcon.send(`ftbchunks admin extra_claim_chunks ${name} add ${amount}`)
+    const regex2 = new RegExp(`${name}/extra_claim_chunks\\s=\\s([0-9]+)$`, 'i')
+    const matched2 = res.match(regex2)
+    if (matched2) {
+      const extraClaimChunks = parseInt(matched2[1], 10)
+      this.logger.verbose(`User ${name} has now ${extraClaimChunks} extra claim chunks`)
+
+      await this.userModel.findOneAndUpdate(
+        { name },
+        { $inc: { currency: -price } },
+        { new: true },
+      ).exec()
+    }
+
+    return res
   }
 
   public async findOrCreateWithMinecraftProfile(metadata: MinecraftProfile): Promise<FlattenMaps<User>> {
