@@ -1,13 +1,10 @@
-import { Prop, SchemaFactory } from '@nestjs/mongoose'
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document, Types } from 'mongoose'
 
+@Schema({
+  _id: false,
+})
 export class ElectionVotePart extends Document {
-  @Prop({
-    type: Types.ObjectId,
-    required: [true, 'User vote id is required'],
-  })
-  public id: Types.ObjectId
-
   @Prop({
     type: String,
     required: [true, 'User vote name is required'],

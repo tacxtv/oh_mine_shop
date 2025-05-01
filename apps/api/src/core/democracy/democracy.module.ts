@@ -4,10 +4,12 @@ import { DemocracyService } from './democracy.service'
 import { RouterModule } from '@nestjs/core'
 import { ConstitutionModule } from './constitution/constitution.module'
 import { LawModule } from './law/law.module'
+import { CandidatureModule } from './candidatures/candidature.module'
 
 @Module({
   imports: [
     ConstitutionModule,
+    CandidatureModule,
     LawModule,
   ],
   controllers: [DemocracyController],
