@@ -2,12 +2,14 @@
   q-card(flat :style="{ flex: 1 }")
     .fit.flex(v-if="defi")
       .flex.justify-center.items-center.column(:style='{flex: 1}')
-        .slot.big.cursor-pointer
+        h6.q-mt-none.q-mb-sm(v-text='getItemTitle')
+        .slot.big.cursor-pointer.flex.column
           img.non-selectable(
             :class="{'no-texture' : !getItemTexture}"
             :src="getItemTexture"
-            :title="getItemTitle"
+            :title="getItemName"
           )
+          div(v-text='getItemName')
         .flex
           q-field(
             :model-value="quantity"
@@ -110,7 +112,10 @@ export default {
       return this.defi?._data?.texture
     },
     getItemTitle() {
-      return this.defi?._data?.name
+      return this.defi?.name
+    },
+    getItemName() {
+      return this.defi?.itemId
     },
     getPlayerMaxQuantity() {
       return this.defi?._playerMaxQuantity || 0
