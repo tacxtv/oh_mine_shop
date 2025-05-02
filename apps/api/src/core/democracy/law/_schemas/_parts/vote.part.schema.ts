@@ -1,14 +1,11 @@
-import { Prop, SchemaFactory } from '@nestjs/mongoose'
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { Document, Types } from 'mongoose'
 import { VoteType } from '../../_enums/vote-type.enum'
 
+@Schema({
+  _id: false,
+})
 export class LawVotePart extends Document {
-  @Prop({
-    type: Types.ObjectId,
-    required: [true, 'User vote id is required'],
-  })
-  public id: Types.ObjectId
-
   @Prop({
     type: String,
     required: [true, 'User vote name is required'],

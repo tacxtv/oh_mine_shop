@@ -17,7 +17,7 @@
     q-card-actions
       q-space
       small.text-negative.q-mr-sm ATTENTION : Vous ne pourrez pas modifier votre candidature une fois proposée
-      q-btn(
+      q-btn.bg-orange.text-white.text-bold(
         label="Proposer"
         color="primary"
         @click="candidate"
@@ -71,6 +71,8 @@ export default {
         type: 'positive',
         message: 'Candidature proposée !',
       })
+
+      this.$router.push('/democracy/vote')
     },
   },
 }

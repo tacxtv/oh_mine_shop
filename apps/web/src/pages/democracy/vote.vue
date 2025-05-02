@@ -8,7 +8,7 @@
           narrow-indicator
           style='max-width: calc(100vw - 150px);'
         )
-          q-btn(flat to='/democracy/candidat' :disable='isCandidat') Devenir candidat
+          q-btn.bg-orange.text-white.text-bold(flat to='/democracy/candidat' :disable='isCandidat') Devenir candidat
           q-separator(vertical).q-my-md.q-mx-sm
           q-tab(v-for='cand in candidature.candidatures' :name='cand.proposedBy' :label='cand.proposedBy')
         .q-gutter-y-sm

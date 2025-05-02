@@ -2,7 +2,8 @@
   q-card(flat :style="{ flex: 1 }")
     q-tabs(v-model='tab' inline-label)
       q-tab(name='vote', label='Vote')
-      q-tab(name='village', label='Village')
+      //- q-tab(name='village', label='Village')
+      q-tab(name='mairie', label='Mairie' icon='mdi-city-variant' v-if='isMairie')
     q-card-section
       nuxt-page
 </template>
@@ -32,6 +33,11 @@ export default {
       const $auth = useAuth()
 
       return ($auth.user as any)?.roles.includes('op')
+    },
+    isMairie(): boolean {
+      const $auth = useAuth()
+
+      return ($auth.user as any)?.roles.includes('maire') || ($auth.user as any)?.roles.includes('adjoint') || this.isAdmin
     },
   },
 }

@@ -19,8 +19,19 @@ export class LawController {
     })
   }
 
+  @Public()
+  @Get('unabbrogated')
+  public async getUnabbrogatedLaws(
+    @Res() res: Response,
+  ): Promise<Response> {
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      data: await this._service.getUnAbbrogatedLaws(),
+    })
+  }
+
   @Post('create')
-  @HasRoles('op', 'maire')
+  @HasRoles('op', 'maire', 'adjoint')
   public async createLaw(
     @Req() req: Request,
     @Res() res: Response,

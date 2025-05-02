@@ -52,7 +52,7 @@ export class CandidatureService {
     electionNumber: number,
     playerName: string,
     target: string,
-  ): Promise<Election> {
+  ): Promise<boolean> {
     const candidatures = await this._model
       .find({ electionNumber, proposedBy: target })
       .exec()
@@ -90,7 +90,7 @@ export class CandidatureService {
       throw new Error('Election not found or already voted')
     }
 
-    return election
+    return !!election
   }
 
   public async hasVoted(

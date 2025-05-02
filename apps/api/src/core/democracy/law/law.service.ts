@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common'
+import { BadRequestException, Injectable, Logger, NotFoundException, UnauthorizedException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Law } from './_schemas/law.schema'
 import { Model } from 'mongoose'
@@ -44,5 +44,63 @@ export class LawService {
     }
 
     await this._model.deleteOne({ _id: id }).exec()
+  }
+
+  public async vote(
+    lawnum: string,
+    playerName: string,
+    vote: number,
+  ): Promise<boolean> {
+    const laws = await this._model
+      .find({ lawnum, appliedAt: { $gt: new Date() } })
+      .sort({ createdAt: -1 })
+      .exec()
+
+    if (laws.length === 0) {
+      throw new NotFoundException('Law not found or already applied')
+    }
+
+    const existingVote = await this._model.findOne({
+      lawnum,
+      'votes.name': playerName,
+    })
+    if (existingVote) {
+      throw new UnauthorizedException('Already voted')
+    }
+
+    const election = await this._model.findOneAndUpdate(
+      {
+        lawnum,
+        'votes.name': { $ne: playerName },
+      },
+      {
+        $addToSet: {
+          votes: {
+            name: playerName,
+            type: vote,
+            votedAt: new Date(),
+          },
+        },
+      },
+      { new: true },
+    )
+
+    if (!election) {
+      throw new Error('Election not found or already voted')
+    }
+
+    return !!election
+  }
+
+  public async getUnAbbrogatedLaws(): Promise<Law[]> {
+    const laws = await this._model
+      .find({
+        abrogatedLawnums: { $exists: false },
+        appliedAt: { $gt: new Date() },
+      })
+      .sort({ createdAt: -1 })
+      .exec()
+
+    return laws || []
   }
 }
