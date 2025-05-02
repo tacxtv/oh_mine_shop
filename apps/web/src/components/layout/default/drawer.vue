@@ -32,7 +32,7 @@ export default {
         { name: 'Banque', to: '/bank', icon: 'mdi-bank' },
         { name: 'Démocracie', to: '/democracy', icon: 'mdi-vote-outline' },
         // { name: 'Hôtel de ventes', to: '/store', icon: 'mdi-store' },
-        // { name: 'Défis de la semaine', to: '/defi/upload', icon: 'mdi-bullseye-arrow' },
+        { name: 'Défis de la semaine', to: '/defi/upload', icon: 'mdi-bullseye-arrow' },
       ],
       bottom: [
         // { name: 'Inventaire', to: '/inventory', icon: 'mdi-archive' }
