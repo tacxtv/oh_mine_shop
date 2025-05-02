@@ -137,13 +137,19 @@ export class UsersService {
     const _currencyFromInventory = await this.quantityFromPlayerForCurrency(name)
 
     let _extra_claim_chunks = 0
-    const extra = await this._rcon.send(`ftbchunks admin extra_claim_chunks ${name} get`)
-    const regex = new RegExp(`${name}/extra_claim_chunks\\s=\\s([0-9]+)$`, 'i')
-    const matched = extra.match(regex)
-    if (matched) {
-      _extra_claim_chunks += parseInt(matched[1], 10)
+    let _nextPrice = 8192
+    try {
+      const extra = await this._rcon.send(`ftbchunks admin extra_claim_chunks ${name} get`)
+      const regex = new RegExp(`${name}/extra_claim_chunks\\s=\\s([0-9]+)$`, 'i')
+      const matched = extra.match(regex)
+      if (matched) {
+        _extra_claim_chunks += parseInt(matched[1], 10)
+      }
+      _nextPrice = Math.round(8192 * (1 + 0.04 * _extra_claim_chunks))
+    } catch (error) {
+      this.logger.error(`Error while getting extra claim chunks for ${name}: ${error}`)
+      throw new BadRequestException('Error while getting extra claim chunks')
     }
-    const _nextPrice = Math.round(8192 * (1 + 0.04 * _extra_claim_chunks))
 
     return {
       _nextPrice,
@@ -189,15 +195,19 @@ export class UsersService {
     }
 
     let _extra_claim_chunks = 0
-    const extra = await this._rcon.send(`ftbchunks admin extra_claim_chunks ${name} get`)
-    const regex1 = new RegExp(`${name}/extra_claim_chunks\\s=\\s([0-9]+)$`, 'i')
-    const matched1 = extra.match(regex1)
-    if (matched1) {
-      _extra_claim_chunks += parseInt(matched1[1], 10)
+    let price = 8192
+    try {
+      const extra = await this._rcon.send(`ftbchunks admin extra_claim_chunks ${name} get`)
+      const regex1 = new RegExp(`${name}/extra_claim_chunks\\s=\\s([0-9]+)$`, 'i')
+      const matched1 = extra.match(regex1)
+      if (matched1) {
+        _extra_claim_chunks += parseInt(matched1[1], 10)
+      }
+      price = Math.round(8192 * (1 + 0.04 * _extra_claim_chunks))
+    } catch (error) {
+      this.logger.error(`Error while getting extra claim chunks for ${name}: ${error}`)
+      throw new BadRequestException('Error while getting extra claim chunks')
     }
-
-    /// base price 8192, with 4percent increase per chunk
-    const price = Math.round(8192 * (1 + 0.04 * _extra_claim_chunks))
 
     if (user.currency < price) {
       throw new BadRequestException('User has not enough currency')
