@@ -1,9 +1,33 @@
 <template lang="pug">
   q-card(flat :style="{ flex: 1 }")
+    .fit.flex.column
+      q-tabs.q-mb-lg(
+        v-model="tab"
+        align="justify"
+        narrow-indicator
+      )
+        q-tab(v-for='cand in candidature.candidatures' :name='cand.proposedBy' :label='cand.proposedBy')
+      .q-gutter-y-sm
+        q-tab-panels.bg-purple.text-white.text-center(
+          v-model="tab"
+          animated
+          transition-prev="scale"
+          transition-next="scale"
+        )
+          q-tab-panel(
+            v-for='cand in candidature.candidatures'
+            :name='cand.proposedBy'
+            :key='cand.proposedBy'
+          )
+            div(v-html='cand.content')
+          div(v-if='!tab') Sélectionne un candidat pour voir son programme
+    q-separator.q-my-md
     .fit.flex(v-if="candidature.candidatures")
       .flex.justify-center.items-center.column(:style='{flex: 1}')
-        .slot.middle.cursor-pointer(@click="toVoteCandidature")
+        .slot.middle.cursor-pointer.flex.column(@click="toVoteCandidature")
           q-icon(name='mdi-circle' size='10vw' :color='candidature.hasVoted ? "green" : "red"')
+          div(v-if='candidature.hasVoted') déjà voté
+          div(v-else) vote pour un maire
         .flex
           q-select(
             v-model="voteCandidature"
@@ -23,6 +47,7 @@
 export default {
   data() {
     return {
+      tab: null,
       voteCandidature: null,
     }
   },
@@ -55,6 +80,10 @@ export default {
   },
   methods: {
     async toVoteCandidature() {
+      if (this.candidature.hasVoted) {
+        return
+      }
+
       if (!this.voteCandidature) {
         this.$q.notify({
           type: 'negative',
