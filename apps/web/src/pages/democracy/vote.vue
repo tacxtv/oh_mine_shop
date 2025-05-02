@@ -3,12 +3,15 @@
     .fit.flex.column
       q-tabs.q-mb-lg(
         v-model="tab"
-        align="justify"
+        align="left"
         narrow-indicator
+        style='max-width: calc(100vw - 150px);'
       )
+        q-btn(flat) Devenir candidat
+        q-separator(vertical).q-my-md.q-mx-sm
         q-tab(v-for='cand in candidature.candidatures' :name='cand.proposedBy' :label='cand.proposedBy')
       .q-gutter-y-sm
-        q-tab-panels.bg-purple.text-white.text-center(
+        q-tab-panels.text-white(
           v-model="tab"
           animated
           transition-prev="scale"
@@ -20,10 +23,13 @@
             :key='cand.proposedBy'
           )
             div(v-html='cand.content')
-          div(v-if='!tab') Sélectionne un candidat pour voir son programme
+        .q-mt-none.text-center.flex.column(v-if='!tab' style='align-items: center;')
+          q-icon(name='mdi-information-outline' size='66px' color='grey-4')
+          small.text-grey Sélectionne un candidat pour voir son programme
     q-separator.q-my-md
     .fit.flex(v-if="candidature.candidatures")
       .flex.justify-center.items-center.column(:style='{flex: 1}')
+        h3.text-center.q-mb-md.q-mt-none Urne de vote
         .slot.middle.cursor-pointer.flex.column(@click="toVoteCandidature")
           q-icon(name='mdi-circle' size='10vw' :color='candidature.hasVoted ? "green" : "red"')
           div(v-if='candidature.hasVoted') déjà voté
