@@ -28,7 +28,7 @@
             q-icon(name='mdi-information-outline' size='66px' color='grey-4')
             small.text-grey Sélectionne un candidat pour voir son programme
       q-separator.q-my-md
-      .fit.flex(v-if="candidature.candidatures")
+      .fit.flex(v-if="candidature.candidatures && isToVote")
         .flex.justify-center.items-center.column(:style='{flex: 1}')
           h3.text-center.q-mb-md.q-mt-none Urne de vote
           .slot.middle.cursor-pointer.flex.column(@click="toVoteCandidature")
@@ -48,6 +48,7 @@
               option-value="proposedBy"
               option-label="proposedBy"
             )
+      div.text-center(v-else) C'est pas encore le moment de voter, reviens plus tard !
     div(v-else-if='hasLaw')
     div(v-else)
       q-card-section.text-center
@@ -112,7 +113,22 @@ export default {
       const hours = currentDate.getHours()
 
       // Vendredi à partir de 18h
-      if (day === 5 && hours >= 18) return true
+      if (day === 5) return true
+
+      // Samedi (toute la journée)
+      if (day === 6) return true
+
+      // Dimanche avant 20h
+      if (day === 0 && hours < 20) return true
+
+      return false
+    },
+    isToVote() {
+      // les elections se déroulent tout les vendredi de 18h à dimanche 20h
+      const currentDate = new Date()
+
+      const day = currentDate.getDay() // 0 = dimanche, 5 = vendredi, 6 = samedi
+      const hours = currentDate.getHours()
 
       // Samedi (toute la journée)
       if (day === 6) return true
