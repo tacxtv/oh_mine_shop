@@ -8,7 +8,7 @@
           narrow-indicator
           style='max-width: calc(100vw - 150px);'
         )
-          q-btn.bg-orange.text-white.text-bold(flat to='/democracy/candidat' :disable='isCandidat') Devenir candidat
+          q-btn.bg-orange.text-white.text-bold(flat to='/democracy/candidat' :disable='isToCandidate') Devenir candidat
           q-separator(vertical).q-my-md.q-mx-sm
           q-tab(v-for='cand in candidature.candidatures' :name='cand.proposedBy' :label='cand.proposedBy')
         .q-gutter-y-sm
@@ -121,6 +121,21 @@ export default {
       if (day === 0 && hours < 20) return true
 
       return false
+    },
+    isToCandidate() {
+      if (this.isCandidat) {
+        return true
+      }
+
+      // les elections se déroulent tout les vendredi de 18h à dimanche 20h
+      const currentDate = new Date()
+
+      const day = currentDate.getDay() // 0 = dimanche, 5 = vendredi, 6 = samedi
+
+      // Vendredi à partir de 18h
+      if (day === 5) return false
+
+      return true
     },
   },
   methods: {

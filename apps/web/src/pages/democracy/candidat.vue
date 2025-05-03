@@ -21,7 +21,7 @@
         label="Proposer"
         color="primary"
         @click="candidate"
-        :disable="!content"
+        :disable="!content || isToCandidate"
       )
 </template>
 
@@ -32,11 +32,56 @@ export default {
       content: '',
     }
   },
+  async setup() {
+    const getUsername = computed(() => {
+      const $auth = useAuth()
+
+      return $auth.user?.name
+    })
+
+    const currentWeekNumber = Math.floor(Date.now() / 1000 / 60 / 60 / 24 / 7)
+
+    const {
+      data: candidature,
+      refresh,
+      error,
+    } = await useHttp<any>('/core/democracy/candidature/' + currentWeekNumber + '/' + getUsername.value, {
+      transform: (result) => {
+        return result?.data || {}
+      },
+    })
+
+    return {
+      error,
+      candidature,
+      refresh,
+
+      getUsername,
+    }
+  },
   computed: {
+    isCandidat() {
+      return this.candidature.candidatures.some((candidat) => candidat.proposedBy === this.getUsername)
+    },
     proposedBy() {
       const $auth = useAuth()
 
       return $auth.user?.name
+    },
+    isToCandidate() {
+      if (this.isCandidat) {
+        return true
+      }
+
+      // les elections se déroulent tout les vendredi de 18h à dimanche 20h
+      const currentDate = new Date()
+
+      const day = currentDate.getDay() // 0 = dimanche, 5 = vendredi, 6 = samedi
+
+      // Vendredi à partir de 18h
+      if (day === 5) return false
+
+      return true
     },
   },
   methods: {
