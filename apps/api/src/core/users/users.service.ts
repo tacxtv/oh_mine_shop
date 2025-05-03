@@ -109,13 +109,18 @@ export class UsersService {
 
     let total = 0
     for (const itemId of Object.keys(itemIds)) {
-      const res = await this._rcon.send(`clear ${player} ${itemId} 0`)
-      const regex = /^Found\s([\d]+)\smatching.*$/
-      const matched = res.replace('\n', '').match(regex)
+      try {
+        const res = await this._rcon.send(`clear ${player} ${itemId} 0`)
+        const regex = /^Found\s([\d]+)\smatching.*$/
+        const matched = res.replace('\n', '').match(regex)
 
-      if (matched) {
-        const quantity = parseInt(matched[1], 10)
-        total += quantity * itemIds[itemId]
+        if (matched) {
+          const quantity = parseInt(matched[1], 10)
+          total += quantity * itemIds[itemId]
+        }
+      } catch (error) {
+        this.logger.error(`Error while getting quantity for ${itemId} from ${player}: ${error}`)
+        throw new BadRequestException('Error while getting quantity')
       }
     }
 
