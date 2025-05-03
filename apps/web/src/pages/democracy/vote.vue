@@ -145,7 +145,7 @@ export default {
         },
       })
 
-      if (error) {
+      if (error.value) {
         console.error('Error while voting:', error)
         this.$q.notify({
           type: 'negative',
