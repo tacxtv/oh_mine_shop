@@ -66,11 +66,18 @@
             v-model="tablaw"
           )
             q-tab-panel(v-for="law in listVoteLaws" :key="law.id" :name='law.lawnum' :label="law.lawnum")
-              h5.text-h5.q-mb-md.q-mt-none
-                q-icon(name='mdi-file-document-edit' size='44px' color='grey-4')
-                | {{ law.title }}
+              q-toolbar(dense)
+                q-toolbar-title.text-left
+                  q-icon(name='mdi-file-document-edit' size='44px' color='grey-4')
+                  | {{ law.title }}
+                q-space
+                div en vigeur le {{ law.appliedAt }}
               q-separator.q-my-md
               div(v-html='law.content')
+              br
+              q-toolbar
+                q-space
+                div proposée par {{ law.proposedBy }}
           q-card-section.text-center(v-if="!tablaw")
             q-icon(name='mdi-information-outline' size='66px' color='grey-4')
             small.text-grey Sélectionne une loi pour voir son contenu
