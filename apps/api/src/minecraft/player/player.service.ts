@@ -6,6 +6,7 @@ import { Byte, Int, parse, Tag } from 'nbt-ts'
 import { Rcon } from 'rcon-client'
 import { ListPlayers, TagInventory } from './_interfaces/player.interface'
 import { existsSync, readFileSync } from 'node:fs'
+import { ArticleService } from '~/core/article/article.service'
 
 (Byte as any).prototype.toJSON = function () {
   return +this.value.toString()
@@ -21,6 +22,7 @@ export class PlayerService {
   public constructor(
     @InjectRcon() private rcon: Rcon,
     @InjectRedis() private readonly _redis: Redis,
+    private readonly _article: ArticleService,
   ) { }
 
   /**
@@ -93,10 +95,17 @@ export class PlayerService {
           _data['texture'] = `data:image/png;base64,${file.toString('base64')}`
         }
 
+        let _average = []
+        const average = await this._article.findAveragePrice(item.id)
+        if (average && average.length > 0) {
+          _average = average[0]?.items ?? []
+        }
+
         return {
           ...item,
           // Attach extra item data if available
           _data,
+          _average,
         }
       })
     )

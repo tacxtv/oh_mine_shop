@@ -49,11 +49,54 @@
               option-label="proposedBy"
             )
       div.text-center(v-else) C'est pas encore le moment de voter, reviens plus tard !
-    div(v-else-if='hasLaw')
+    div.text-center(v-else-if='hasLaw')
+      h4.q-my-none Votez pour une loi
+      small.text-grey.q-mb-md Vous pouvez voter pour une loi proposée par un membre du gouvernement
+      q-separator.q-my-md
+      q-splitter(v-model="splitterModel" style="height: 100%")
+        template(#before)
+          q-tabs(
+            v-model="tablaw"
+            align="justify"
+            vertical
+          )
+            q-tab(v-for="law in listVoteLaws" :key="law.id" :name='law.lawnum' :label="law.lawnum")
+        template(#after)
+          q-tab-panels(
+            v-model="tablaw"
+          )
+            q-tab-panel(v-for="law in listVoteLaws" :key="law.id" :name='law.lawnum' :label="law.lawnum")
+              h5.text-h5.q-mb-md.q-mt-none
+                q-icon(name='mdi-file-document-edit' size='44px' color='grey-4')
+                | {{ law.title }}
+              q-separator.q-my-md
+              div(v-html='law.content')
+          q-card-section.text-center(v-if="!tablaw")
+            q-icon(name='mdi-information-outline' size='66px' color='grey-4')
+            small.text-grey Sélectionne une loi pour voir son contenu
+      q-separator.q-my-md(v-if='tablaw')
+      .fit.flex(v-if="tablaw")
+        .flex.justify-center.items-center.column(:style='{flex: 1}')
+          h3.text-center.q-mb-md.q-mt-none Urne de vote
+          .slot.middle.cursor-pointer.flex.column(@click="toVoteLaw")
+            q-icon(name='mdi-circle' size='10vw' :color='hasLawVoted ? "green" : "red"')
+            div(v-if='hasLawVoted') déjà voté
+            div(v-else) vote pour une mesure
+          .flex
+            q-select(
+              v-model="voteLaw"
+              :options="[{label: 'Approuver', value: 1}, {label: 'Refuser', value: -1}, {label: 'Sabstenir', value: 0}]"
+              :disable="false"
+              :label="`Vote pour la future loi !`"
+              emit-value
+              map-options
+              error-message="Vous devez voter pour une loi !"
+              :style='{ width: "35vw" }'
+            )
     div(v-else)
       q-card-section.text-center
         h2.text-h4.q-mb-md.q-mt-none
-          | Pas d'élection en cours
+          | Pas d'élection ou de vote en cours
           q-icon(name='mdi-information-outline' size='66px' color='grey-4')
         small.text-grey
           | Les élections se déroulent tous les vendredis de 18h à dimanche 20h
@@ -65,8 +108,11 @@
 export default {
   data() {
     return {
+      splitterModel: 20,
+      tablaw: null,
       tab: null,
       voteCandidature: null,
+      voteLaw: null,
     }
   },
   async setup() {
@@ -88,10 +134,23 @@ export default {
       },
     })
 
+    const {
+      data: law,
+      refresh: refreshLaw,
+      error: errorLaw,
+    } = await useHttp<any>('/core/democracy/law/' + getUsername.value, {
+      transform: (result) => {
+        return result?.data || {}
+      },
+    })
+
     return {
       error,
       candidature,
       refresh,
+      errorLaw,
+      law,
+      refreshLaw,
 
       getUsername,
     }
@@ -101,9 +160,29 @@ export default {
       return this.candidature.candidatures.some((candidat) => candidat.proposedBy === this.getUsername)
     },
     hasLaw() {
-      const $auth = useAuth()
+      if (this.law.length > 0) {
+        return this.law.some((law) => {
+          const appliedAtTs = new Date(law.appliedAt).getTime()
+          const currentTs = new Date().getTime()
 
-      return $auth.user?.hasLaw
+          return appliedAtTs < currentTs
+        })
+      }
+    },
+    hasLawVoted() {
+      const law = this.law.filter((l) => this.tablaw === l.lawnum)
+      if (law.length > 0) {
+        return law[0].voted
+      }
+      return false
+    },
+    listVoteLaws() {
+      return this.law.filter((law) => {
+        const appliedAtTs = new Date(law.appliedAt).getTime()
+        const currentTs = new Date().getTime()
+
+        return appliedAtTs > currentTs
+      })
     },
     isElection() {
       // les elections se déroulent tout les vendredi de 18h à dimanche 20h
@@ -155,6 +234,46 @@ export default {
     },
   },
   methods: {
+    async toVoteLaw() {
+      if (this.hasLawVoted) {
+        return
+      }
+
+      if (typeof this.voteLaw !== 'number') {
+        this.$q.notify({
+          type: 'negative',
+          message: 'Vous devez voter pour une loi !',
+        })
+        return
+      }
+
+      // const currentWeekNumber = Math.floor(Date.now() / 1000 / 60 / 60 / 24 / 7)
+      const { data, error } = await useHttp<any>('/core/democracy/law/vote/' + this.getUsername + '/' + this.tablaw, {
+        method: 'POST',
+        body: {
+          vote: this.voteLaw,
+        },
+      })
+
+      if (error.value) {
+        console.error('Error while voting:', error)
+        this.$q.notify({
+          type: 'negative',
+          message: 'Erreur lors du vote: ' + error.value?.data.message,
+        })
+        return
+      }
+
+      if (data) {
+        this.$q.notify({
+          type: 'positive',
+          message: 'Vote pris en compte !',
+        })
+        this.refresh()
+        this.refreshLaw()
+        this.tablaw = null
+      }
+    },
     async toVoteCandidature() {
       if (this.candidature.hasVoted) {
         return

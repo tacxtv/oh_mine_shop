@@ -27,9 +27,9 @@ export class PlayerController {
       })
     }
 
-    return {
+    return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
       data: await this.service.getPlayerInventory(playerName),
-    }
+    })
   }
 }

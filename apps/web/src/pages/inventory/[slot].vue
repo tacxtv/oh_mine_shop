@@ -5,12 +5,12 @@
         .col-12.col-md-8
           q-input(v-model="formData.item" label="Name" readonly outlined)
         .col-12.col-md-4
-          q-select(v-model="formData.stack" label="Stack" :options='[1, 16, 64]' outlined)
+          q-select(v-model="formData.stack" label="Stack" :options='getStackList' outlined)
       .row.q-col-gutter-md.q-mb-md
         .col-12.col-md-6
           q-input(v-model="formData.price" label="Prix de vente" type="number" step="1" outlined)
         .col-12.col-md-6
-          q-input(v-model="formData.price" label="Prix moyen /stack" type="number" readonly outlined)
+          q-input(v-model="formData.average" label="Prix moyen /stack" type="number" readonly outlined)
 
   q-expansion-item.bg-blue-grey-10(label='NBT' icon='mdi-bug' dark dense)
     .outer-ne-resize(:style='{minHeight: "250px", height: "250px"}')
@@ -51,6 +51,18 @@ export default {
     return {
       getUsername,
     }
+  },
+  computed: {
+    getStackList() {
+      console.log('_current', this.formData._current)
+      if (this.formData._current < 64 && this.formData._current >= 16) {
+        return [1, 16]
+      }
+      if (this.formData._current < 16) {
+        return [1]
+      }
+      return [1, 16, 64]
+    },
   },
   methods: {
     async sell() {

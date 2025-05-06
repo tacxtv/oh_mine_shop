@@ -19,5 +19,6 @@ import { ItemModule } from '~/minecraft/item/item.module'
   ],
   controllers: [ArticleController],
   providers: [ArticleService],
+  exports: [ArticleService],
 })
 export class ArticleModule { }

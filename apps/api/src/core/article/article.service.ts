@@ -22,10 +22,14 @@ export class ArticleService {
     private readonly _item: ItemService,
   ) { }
 
-  public async findAveragePrice(mod: string) {
+  public async findAveragePrice(mod: string, filterSearch: string = '') {
     let filters = {}
     filters['state'] = ArticleState.SELLED
-    filters['name'] = new RegExp('^' + mod, 'i')
+    if (!filterSearch) {
+      filters['name'] = new RegExp('^' + mod, 'i')
+    } else {
+      filters['name'] = new RegExp('^' + mod + ':' + filterSearch, 'i')
+    }
 
     const items = await this._model.aggregate([
       { $match: filters },
@@ -54,10 +58,46 @@ export class ArticleService {
     return items
   }
 
-  public async findBestPrice(mod: string) {
+  public async findAverageOne(name: string) {
+    let filters = {}
+    filters['state'] = ArticleState.SELLED
+    filters['name'] = name
+
+    const items = await this._model.aggregate([
+      { $match: filters },
+      {
+        $group: {
+          _id: { name: '$name', stack: '$stack' },
+          price: { $avg: '$price' },
+          quantity: { $sum: 1 },
+        },
+      },
+      {
+        $group: {
+          _id: '$_id.name',
+          items: {
+            $push: {
+              name: '$_id.name',
+              stack: '$_id.stack',
+              quantity: '$quantity',
+              price: '$price',
+            },
+          },
+        },
+      },
+    ])
+
+    return items
+  }
+
+  public async findBestPrice(mod: string, filterSearch: string = '') {
     let filters = {}
     filters['state'] = ArticleState.ON_SALE
-    filters['name'] = new RegExp('^' + mod, 'i')
+    if (!filterSearch) {
+      filters['name'] = new RegExp('^' + mod, 'i')
+    } else {
+      filters['name'] = new RegExp('^' + mod + ':' + filterSearch, 'i')
+    }
 
     const items = await this._model.aggregate([
       { $match: filters },
@@ -148,6 +188,7 @@ export class ArticleService {
       stack: options.stack,
       nbt: invSlot[0].tag ? invSlot[0].tag : null,
       state: ArticleState.ON_SALE,
+      onSaleAt: new Date(),
       vendor: {
         name: playerModel.name,
         id: playerModel._id,
@@ -207,6 +248,7 @@ export class ArticleService {
       {
         $match: {
           name: { $regex: /:/ },
+          state: ArticleState.ON_SALE,
         },
       },
       {
@@ -255,12 +297,21 @@ export class ArticleService {
       stack: options.stack,
       price: options.price,
       nbt: options.nbt,
+      state: ArticleState.ON_SALE,
     })
+
+    if (!data) throw new NotFoundException('Item not found')
+
+    const playerModel = await this._users.findOne({ name: player })
+    if (!playerModel) throw new NotFoundException('Player not found')
+    if (playerModel.currency < data.price) {
+      throw new NotAcceptableException('Not enough money')
+    }
 
     const EnderItems = (await this.findByName(player, 'EnderItems')) || []
 
     const sortedEnderItems = []
-    for (let i = 0; i < 26; i++) {
+    for (let i = 0; i < 27; i++) {
       const filter = EnderItems.filter((item) => item.Slot.value === i)
       if (filter[0]) {
         sortedEnderItems.push(filter[0])
@@ -269,7 +320,7 @@ export class ArticleService {
       }
     }
 
-    for (let i = 0; i < 29; i++) {
+    for (let i = 0; i < 27; i++) {
       if (sortedEnderItems[i].id) continue
       const result = await this._rcon.send(
         `item replace entity ${player} enderchest.${i} with ${id}${stringify(
@@ -281,12 +332,17 @@ export class ArticleService {
           `Replaced a slot on ${player}`,
         )
       ) {
-        await this._users.findByIdAndUpdate(data._id, {
+        await this._model.findByIdAndUpdate(data._id, {
           'metadata.purchaseBy': player,
           'metadata.selledAt': new Date(),
+          state: ArticleState.SELLED,
         })
       }
       return { result }
     }
+
+    throw new NotAcceptableException(
+      'No more space in enderchest',
+    )
   }
 }

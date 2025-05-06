@@ -11,11 +11,12 @@ export class ArticleController {
   @Get('search')
   public async search(
     @Query('mod') mod: string,
+    @Query('recherche') recherche: string,
     @Res() res: Response,
   ): Promise<Response> {
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
-      data: await this._service.findBestPrice(mod),
+      data: await this._service.findBestPrice(mod, recherche),
     })
   }
 
@@ -23,11 +24,12 @@ export class ArticleController {
   @Get('average')
   public async average(
     @Query('mod') mod: string,
+    @Query('recherche') recherche: string,
     @Res() res: Response,
   ): Promise<Response> {
     return res.status(HttpStatus.OK).json({
       statusCode: HttpStatus.OK,
-      data: await this._service.findAveragePrice(mod),
+      data: await this._service.findAveragePrice(mod, recherche),
     })
   }
 

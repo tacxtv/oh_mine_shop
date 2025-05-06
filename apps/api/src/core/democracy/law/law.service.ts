@@ -3,18 +3,28 @@ import { InjectModel } from '@nestjs/mongoose'
 import { Law } from './_schemas/law.schema'
 import { Model } from 'mongoose'
 import { generateArtLawNum } from '~/_common/_functions/generate-artlaw-num'
+import { omit } from 'radash'
 
 @Injectable()
 export class LawService {
-  public constructor(@InjectModel(Law.name) public _model: Model<Law>) {
+  public constructor(@InjectModel(Law.name) public _model: Model<Partial<Law>>) {
   }
 
-  public async getLaws(): Promise<Law[]> {
+  public async getLaws(playerName: string = ''): Promise<Law[]> {
     const laws = await this._model.find({}, {
-      votes: 0,
+      // votes: 0,
     }).exec()
 
-    return laws || []
+    return (laws || []).map((law) => {
+      let voted = undefined
+      if (playerName) {
+        voted = law.votes.some((vote) => vote.name === playerName)
+      }
+      return {
+        ...omit(law.toObject(), ['votes']),
+        voted,
+      }
+    })
   }
 
   public async createLaw(body: Partial<Law>): Promise<Law> {

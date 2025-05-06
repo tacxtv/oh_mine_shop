@@ -97,8 +97,10 @@ export default {
       formData: {
         item: '',
         nbt: {},
+        _current: 0,
         stack: 1,
         price: 1,
+        average: 1,
       },
     }
   },
@@ -174,12 +176,24 @@ export default {
       this.fillFormData(this.getItemData(this.slot))
     },
     fillFormData(data: any) {
-      const { id, Count, _averagePrice, tag } = data
+      const { id, Count, _average, tag } = data
 
       this.formData.item = id
       this.formData.stack = Count >= 64 ? 64 : Count >= 16 ? 16 : 1
+      this.formData._current = Count
       this.formData.nbt = tag ?? {}
-      this.formData.price = _averagePrice ?? 1
+      // this.formData.price = _average > 1 ? Math.round(_average) : 1
+      // this.formData.average = Math.round(_average) ?? -1
+
+      // const average = _average.some((item) => item.stack === Count)
+      const average = [...(Array.isArray(_average) ? _average : [])].filter((item) => item.stack === Count)
+      if (average.length > 0) {
+        this.formData.average = Math.round(average[0].price)
+        this.formData.price = this.formData.average > 1 ? Math.round(this.formData.average) - 1 : 1
+      } else {
+        this.formData.average = -1
+      }
+      console.log('average', average, Count)
     },
     detectVisibilityChange() {
       if (document.visibilityState === 'visible') {
