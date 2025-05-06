@@ -7,7 +7,8 @@ import { omit } from 'radash'
 
 @Injectable()
 export class LawService {
-  public constructor(@InjectModel(Law.name) public _model: Model<Partial<Law>>) {
+  public constructor(@InjectModel(Law.name) public _model: Model<Partial<Law & { voted: boolean }>>) {
+    this._model = _model
   }
 
   public async getLaws(playerName: string = ''): Promise<Law[]> {

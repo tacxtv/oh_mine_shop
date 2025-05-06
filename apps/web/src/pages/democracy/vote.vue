@@ -165,7 +165,7 @@ export default {
           const appliedAtTs = new Date(law.appliedAt).getTime()
           const currentTs = new Date().getTime()
 
-          return appliedAtTs < currentTs
+          return appliedAtTs > currentTs
         })
       }
     },
