@@ -86,7 +86,7 @@
             q-select(
               v-model="voteLaw"
               :options="[{label: 'Approuver', value: 1}, {label: 'Refuser', value: -1}, {label: 'Sabstenir', value: 0}]"
-              :disable="false"
+              :disable="hasLawVoted"
               :label="`Vote pour la future loi !`"
               emit-value
               map-options
