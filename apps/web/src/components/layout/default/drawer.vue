@@ -30,7 +30,7 @@ export default {
       main: [
         { name: 'Accueil', to: '/', icon: 'mdi-view-dashboard' },
         { name: 'Banque', to: '/bank', icon: 'mdi-bank' },
-        { name: 'Démocracie', to: '/democracy', icon: 'mdi-vote-outline' },
+        { name: 'Démocratie', to: '/democracy', icon: 'mdi-vote-outline' },
         // { name: 'Hôtel de ventes', to: '/store?mod=minecraft&recherche=', icon: 'mdi-store' },
         { name: 'Défis de la semaine', to: '/defi/upload', icon: 'mdi-bullseye-arrow' },
       ],
