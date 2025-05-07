@@ -20,6 +20,26 @@ export class ArticleController {
     })
   }
 
+  @Get('my/:playerName')
+  public async my(
+    @Param('playerName') playerName: string,
+    @Query('recherche') recherche: string,
+    @Req() req: Request & { user: any },
+    @Res() res: Response,
+  ): Promise<Response> {
+    if ((req.user as any).name !== playerName && !(req.user as any).roles.includes('op')) {
+      return res.status(HttpStatus.FORBIDDEN).json({
+        statusCode: HttpStatus.FORBIDDEN,
+        message: 'You are not allowed to sell this item',
+      })
+    }
+
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      data: await this._service.findMy(playerName, recherche),
+    })
+  }
+
   @Public()
   @Get('average')
   public async average(

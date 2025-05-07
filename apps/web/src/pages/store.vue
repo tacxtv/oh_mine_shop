@@ -2,11 +2,14 @@
   q-card.flex.full-width(flat :style="{ flex: 1 }")
     q-card-section(style='position: relative;bottom: 0;top: 0;max-height: 100%; min-width: 288px;')
       q-tabs(v-model="mod" outside-arrows vertical style='max-height: 100%;position: absolute;top:0;bottom: 0;')
+        q-tab(name="my")
+            //- q-avatar.q-mr-sm(square color="secondary" text-color="white" size='25px') MY
+            q-item-label Vos items
         q-tab(v-for='mod in mods' :key="mod.name" :name="mod.name")
           div.flex.row.items-center
             q-avatar.q-mr-sm(square color="secondary" text-color="white" size='25px') {{ getModIcon(mod.name) }}
             q-item-label {{ mod.name }}
-            q-badge.q-ml-xs(color='info') {{ mod.count }}
+            q-badge.q-ml-xs(color='red') {{ mod.count }}
 
     q-card-section(:style="{ flex: 1 }")
       q-table(
@@ -14,6 +17,7 @@
         title="Articles"
         :rows="search"
         :columns="searchColumns"
+        @keyup.enter="enterSearch"
         row-key="name"
       )
         template(#top="props")
@@ -24,8 +28,17 @@
               v-model="recherche"
               debounce="300"
               placeholder="Search"
+              clearable
+              @keyup.enter="enterSearch"
               class="q-ml-sm"
               :style="{ width: '300px' }"
+            )
+            q-btn(
+              @click="enterSearch"
+              color="red"
+              round
+              dense
+              icon="mdi-magnify"
             )
         template(#header="props")
           q-tr(:props="props")
@@ -75,30 +88,32 @@ export default {
       get: () => {
         return `${useRoute().query.mod || 'all'}`
       },
-      set: (value) => {
+      set: async (value) => {
         const $route = useRoute()
         const $router = useRouter()
-        $router.replace({
+        await $router.replace({
           query: {
             ...$route.query,
             mod: `${value}`,
           },
         })
+        window.location.href = $route.fullPath
       },
     })
     const recherche = computed({
       get: () => {
         return `${useRoute().query.recherche || ''}`
       },
-      set: (value) => {
+      set: async (value) => {
         const $route = useRoute()
         const $router = useRouter()
-        $router.replace({
+        await $router.replace({
           query: {
             ...$route.query,
-            recherche: `${value}`,
+            recherche: `${value || ''}`,
           },
         })
+        // window.location.href = $route.fullPath
       },
     })
 
@@ -118,11 +133,18 @@ export default {
       },
     })
 
+    const path = ref('/core/article/search')
+    if (mod.value === 'my') {
+      path.value = `/core/article/my/${getUsername.value}`
+    } else {
+      path.value = '/core/article/search'
+    }
+
     const {
       data: search,
       refresh: refreshSearch,
       error: errorSearch,
-    } = await useHttp<any>('/core/article/search', {
+    } = await useHttp<any>(path, {
       query: { mod, recherche: recherche.value },
       transform: (result) => {
         return result?.data || []
@@ -167,6 +189,11 @@ export default {
     },
   },
   methods: {
+    enterSearch() {
+      const $route = useRoute()
+      this.refreshSearch()
+      window.location.href = $route.fullPath
+    },
     getAveragePrice(item) {
       const average = this.average.find((average) => average._id === item.name)
       if (average) {

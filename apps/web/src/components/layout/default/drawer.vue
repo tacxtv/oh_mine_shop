@@ -31,12 +31,10 @@ export default {
         { name: 'Accueil', to: '/', icon: 'mdi-view-dashboard' },
         { name: 'Banque', to: '/bank', icon: 'mdi-bank' },
         { name: 'Démocratie', to: '/democracy', icon: 'mdi-vote-outline' },
-        // { name: 'Hôtel de ventes', to: '/store?mod=minecraft&recherche=', icon: 'mdi-store' },
+        { name: 'Hôtel de ventes', to: '/store?mod=minecraft&recherche=', icon: 'mdi-store' },
         { name: 'Défis de la semaine', to: '/defi/upload', icon: 'mdi-bullseye-arrow' },
       ],
-      bottom: [
-        /* { name: 'Inventaire', to: '/inventory', icon: 'mdi-archive' } */
-      ],
+      bottom: [{ name: 'Inventaire', to: '/inventory', icon: 'mdi-archive' }],
     }
   },
   setup() {

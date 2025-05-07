@@ -11,8 +11,38 @@ export class LawService {
     this._model = _model
   }
 
+  public async getAllLaws(): Promise<Law[]> {
+    const currentDate = new Date()
+
+    const laws = await this._model.find({
+      appliedAt: {
+        $lte: currentDate,
+      },
+    }, {
+      // votes: 0,
+    }).exec()
+
+    return (laws || []).map((law) => {
+      let approuved = 0
+      for (const vote of law.votes) {
+        approuved += vote.type
+      }
+
+      return {
+        ...omit(law.toObject(), ['votes']),
+        approuved: approuved > 0,
+      }
+    })
+  }
+
   public async getLaws(playerName: string = ''): Promise<Law[]> {
-    const laws = await this._model.find({}, {
+    const currentDate = new Date()
+
+    const laws = await this._model.find({
+      appliedAt: {
+        $gt: currentDate,
+      },
+    }, {
       // votes: 0,
     }).exec()
 

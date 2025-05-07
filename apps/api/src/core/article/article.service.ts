@@ -168,6 +168,81 @@ export class ArticleService {
     )
   }
 
+  public async findMy(playerName: string, filterSearch: string = '') {
+    let filters = {}
+    filters['state'] = ArticleState.ON_SALE
+    if (filterSearch) {
+      filters['name'] = new RegExp(filterSearch, 'i')
+    }
+
+    const playerModel = await this._users.findOne({ name: playerName })
+    if (!playerModel) throw new NotFoundException('Player not found')
+
+    filters['vendor.id'] = playerModel._id
+
+    const items = await this._model.aggregate([
+      { $match: filters },
+      {
+        $match: {
+          state: ArticleState.ON_SALE,
+        },
+      },
+      {
+        $group: {
+          _id: { name: '$name', stack: '$stack', nbt: '$nbt', state: '$state' },
+          price: { $min: '$price' },
+          quantity: { $sum: 1 },
+          onSaleAt: { $max: '$metadata.onSaleAt' },
+        },
+      },
+      {
+        $group: {
+          _id: '$_id.name',
+          items: {
+            $push: {
+              name: '$_id.name',
+              stack: '$_id.stack',
+              nbt: '$_id.nbt',
+              quantity: '$quantity',
+              state: '$state',
+              price: '$price',
+              'onSaleAt': '$onSaleAt'
+            },
+          },
+          // stack: '$stack',
+        },
+      },
+      {
+        $sort: {
+          '_id': 1,
+        },
+      },
+    ])
+
+    return await Promise.all(
+      items.map(async (item) => {
+        let _data = {}
+        const data = await this._redis.get(`oms:items:${item.id}`)
+        try {
+          _data = JSON.parse(data).model
+        } catch (error) {
+        }
+
+        if (existsSync(`../../storage/render/${item._id.replace(':', '__')}.png`)) {
+          const file = readFileSync(`../../storage/render/${item._id.replace(':', '__')}.png`)
+          _data['texture'] = `data:image/png;base64,${file.toString('base64')}`
+        }
+
+        return {
+          ...item,
+          name: item._id.split(':')[1],
+          mod: item._id.split(':')[0],
+          _data,
+        }
+      }),
+    )
+  }
+
   public async sellItem(
     name: string,
     slot: number,

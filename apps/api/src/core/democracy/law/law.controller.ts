@@ -9,6 +9,17 @@ export class LawController {
   public constructor(private readonly _service: LawService) { }
 
   @Public()
+  @Get('all')
+  public async getAllLaws(
+    @Res() res: Response,
+  ): Promise<Response> {
+    return res.status(HttpStatus.OK).json({
+      statusCode: HttpStatus.OK,
+      data: await this._service.getAllLaws(),
+    })
+  }
+
+  @Public()
   @Get(':playerName')
   public async getLaws(
     @Res() res: Response,
