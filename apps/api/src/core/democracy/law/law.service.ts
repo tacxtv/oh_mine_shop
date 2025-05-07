@@ -27,10 +27,13 @@ export class LawService {
       for (const vote of law.votes) {
         approuved += vote.type
       }
+      let proposedAt = law.appliedAt
+      proposedAt.setDate(proposedAt.getDate() - 1) // 24h before the vote
 
       return {
         ...omit(law.toObject(), ['votes']),
         approuved: approuved > 0,
+        proposedAt,
       }
     })
   }
@@ -51,9 +54,13 @@ export class LawService {
       if (playerName) {
         voted = law.votes.some((vote) => vote.name === playerName)
       }
+      let proposedAt = law.appliedAt
+      proposedAt.setDate(proposedAt.getDate() - 1) // 24h before the vote
+
       return {
         ...omit(law.toObject(), ['votes']),
         voted,
+        proposedAt,
       }
     })
   }

@@ -77,7 +77,7 @@
               br
               q-toolbar
                 q-space
-                div proposée par {{ law.proposedBy }}
+                div proposée par {{ law.proposedBy }} le {{ law.proposedAt }}
           q-card-section.text-center(v-if="!tablaw")
             q-icon(name='mdi-information-outline' size='66px' color='grey-4')
             small.text-grey Sélectionne une loi pour voir son contenu
@@ -168,12 +168,23 @@ export default {
     },
     hasLaw() {
       if (this.law.length > 0) {
-        return this.law.some((law) => {
+        const total = this.law.length
+        let current = 0
+        for (const law of this.law) {
           const appliedAtTs = new Date(law.appliedAt).getTime()
           const currentTs = new Date().getTime()
 
-          return appliedAtTs > currentTs
-        })
+          if (appliedAtTs > currentTs) {
+            current++
+          }
+        }
+        return current !== total
+        // return this.law.some((law) => {
+        //   const appliedAtTs = new Date(law.appliedAt).getTime()
+        //   const currentTs = new Date().getTime()
+
+        //   return appliedAtTs > currentTs
+        // })
       }
     },
     hasLawVoted() {
@@ -188,7 +199,10 @@ export default {
         const appliedAtTs = new Date(law.appliedAt).getTime()
         const currentTs = new Date().getTime()
 
-        return appliedAtTs > currentTs
+        if (appliedAtTs > currentTs) {
+          return false
+        }
+        return true
       })
     },
     isElection() {
