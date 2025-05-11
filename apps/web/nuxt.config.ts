@@ -161,7 +161,7 @@ export default defineNuxtConfig({
     iconSet: 'mdi-v7',
     plugins: ['Dialog', 'Loading', 'Notify'],
     config: {
-      dark: 'auto',
+      dark: true,
       brand: {
         primary: '#F2DF4B',
         secondary: '#1E202C',
