@@ -143,7 +143,7 @@ export class LawService {
   public async getUnAbbrogatedLaws(): Promise<Law[]> {
     const laws = await this._model
       .find({
-        abrogatedLawnums: { $exists: false },
+        abrogatedLawnums: { $size: 0 },
         appliedAt: { $gt: new Date() },
       })
       .sort({ createdAt: -1 })

@@ -231,7 +231,7 @@ export default {
       const hours = currentDate.getHours()
 
       // Samedi (toute la journée)
-      if (day === 6) return true
+      // if (day === 6) return true
 
       // Dimanche avant 20h
       if (day === 0 && hours < 20) return true
@@ -250,6 +250,7 @@ export default {
 
       // Vendredi à partir de 18h
       if (day === 5) return false
+      if (day === 6) return false
 
       return true
     },
